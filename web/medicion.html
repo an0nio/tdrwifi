@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tektronix y Tdr100</title>
+<meta name="description" content="tdr"/>
+<meta name="author" content="JJJ">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="css/bootstrap-table.min.css"> 
+<link rel="stylesheet" href="css/bootstrap.min.css"  > 
+
+<!-- <script src="https://d3js.org/d3.v4.js"></script> -->
+
+
+<script src="js/bootstrap.min.js"></script> 
+<script src="js/d3.js"></script> 
+<script src="js/jquery-3.4.1.js"></script> 
+<script src="js/bootstrap.bundle.min.js"></script> 
+<script src="js/bootstrap-table.min.js"></script> 
+<!-- <script src="js/tableExport.min.js"></script>  -->
+<script src= "js/scriptMedicion.js" type="text/javascript"> </script> 
+
+
+
+
+</head>
+
+<body>
+
+
+<!-- <nav class="navbar navbar-expand-sm fixed-top  navbar-dark bg-primary" > -->
+<!-- 	<div class="container "  > -->
+<!-- 	    <a class="navbar-brand" href="#">Navegación</a> -->
+<!-- 	    <button style="heigth: center" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation"> -->
+<!-- 	        <span class="navbar-toggler-icon"></span> -->
+<!-- 	    </button> -->
+<!-- 	    <div class="collapse navbar-collapse" id="navbarNavAltMarkup"> -->
+<!-- 	        <div class="navbar-nav"> -->
+<!-- 	            <a class="nav-item nav-link " href="index.html">Indice <span class="sr-only">(current)</span></a> -->
+<!-- 	            <a class="nav-item nav-link" href="parametrosTdr100.html">Parámetros</a> -->
+<!-- 	            <a class="nav-item nav-link active disabled">Medición</a> -->
+<!-- 	         </div> -->
+<!-- 		</div> -->
+<!-- 	</div> -->
+<!-- </nav> -->
+
+
+
+
+<div class="container "  >
+
+<h2 style="margin-top:20px"><center>WIFI TDR</center></h2>
+
+
+
+
+
+	<form style="margin-top: 10px">
+	  <div class="form-row">
+	    
+	  <div class="form-row col-md-12">
+	    <div class="col-6">
+	      <label class="text-warning" > Proyect </label>
+	     
+	       <select class="form-control" id="configMedicion" name="configMedicion">
+	      	</select>
+	    </div>
+	    <!-- <div class="col">
+	    	<label class="text-warning" > Muestras </label>
+	        <input type=number class="form-control" id="muestras" name="muestras" value=1 min=1 max=20>
+	       
+			</div> -->
+			<div class="col">
+	      <button id="configOnda" type="button"  class="btn btn-warning" style="margin-top:30px" data-toggle="modal"  data-backdrop="static" data-keyboard="false" data-target="#modalConfig">Configuration</button>
+	      
+	    </div>
+	    <div class="col">
+	      <button id="añadir" type="button"  class="btn btn-success" style="margin-top:30px" data-toggle="modal"  data-backdrop="static" data-keyboard="false" data-target="#modalAñadir">Refresh</button>
+	      
+	    </div>
+	  </div>
+	   </div>
+	</form>
+
+      <div class="field-wrap" id="muestraNo"  style="text-align:center ; margin-top: 3%">
+				<label style=" text-align:right;font-size:22px;" >
+					Sin ninguna muestra 
+				</label>
+			</div>
+
+<!-- 			<div class="field-wrap" id="muestraSi" style="text-align:center ; margin-top: 3% "> -->
+<!-- 				<label style=" text-align:right;font-size:22px;"> -->
+<!-- 					Ondas -->
+<!-- 				</label> -->
+<!-- 			</div> -->
+
+
+<!-- <table id="tabla"> -->
+<!--   <thead> -->
+<!--     <tr> -->
+<!--       <th data-field="id">ID</th> -->
+<!--       <th data-field="name">Item Name</th> -->
+<!--       <th data-field="price">Item Price</th> -->
+<!--     </tr> -->
+<!--   </thead> -->
+<!-- </table> -->
+
+
+
+<!-- data-url="https://examples.wenzhixin.net.cn/examples/bootstrap_table/data" -->
+<!-- data-side-pagination="client" -->
+	<div style="width:100%;  margin: 0 auto ">
+<!-- 	data-url="https://examples.wenzhixin.net.cn/examples/bootstrap_table/data" -->
+	  
+<!-- 	  data-response-handler="responseHandler"> -->
+	
+	
+<div id="tablaBootstrap">
+	<table class="table table-hover"
+	  id="table"	  
+	  data-toggle="table"
+	  data-search="true"
+	  data-click-to-select="true"
+	  data-detail-formatter="detailFormatter"
+	  data-minimum-count-columns="2"
+	  data-pagination="true"
+	  data-id-field="id"
+	  data-page-size="5"
+	  data-page-list="[5,10, 25, 50, 100, all]">
+	  
+	</table>
+</div>
+	
+	<div id="toolbar">
+	  <button id="remove" class="btn btn-danger"  disabled>
+	    <i class="glyphicon glyphicon-remove"></i> Delete
+		</button>
+	</div>
+			<div style=" margin-top: 15px">
+			<button id="volcarConfig" class="btn btn-success" style="float: right;" >
+					Export data
+	  		</button>
+			</div>
+			<div>
+			  <label for="files" class="btn btn-info"  >Import data</label>
+			  <input id="files" accept=".json" style="visibility:hidden;" type="file">
+			</div>
+	
+	</div>   
+
+	
+
+</div>
+
+
+<!-- ------------------Modal para guardar la onda   (modalAñadir)---------------------- -->
+
+<div class="modal fade bd-example-modal-xl" id="modalAñadir" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Waveform</h5>
+        <button id="xGuardar"type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+			</div>
+			
+<!--       <div class="modal-body" > -->
+<!-- 				<h4>Gráfica</h4> -->
+<!-- 			</div> -->
+			<div id="loading">
+			 <div class="d-flex align-items-center"  style=" margin-left: 15px; width: 90%" >
+			   <div id="textoSpin"><strong > <h4>Aquaring waveform... </h4> </strong></div>
+			  <div class="spinner-border ml-auto" id="spin" role="status" ></div>
+			</div>
+			</div>
+
+			<div style="margin-bottom: 10px">
+				<div class="form-row col-md-12">
+					<div class="col-8">
+						<label>
+							Select Project:   
+						</label>
+      	   <select class="form-control form-control-sm" id="selectObtenerModal" name="selectObtenerModal"></select>
+						
+					</div>
+						<button id="refresh" style="margin-top:30px"type="button" class="btn btn-info btn-sm" >Refresh</button>
+					</div>
+			</div>
+
+			<div id="divGraph1"></div>
+
+				<div class="form-row col-md-12" >
+					<div class="col-3">
+						<label >First Peak  <br>  (or click Graph): </label>
+					</div>
+					<div class="col-3">
+							<input class="form-control form-control-sm" style="height: 40px"id="firstPeak" placeholder="Click Graph" type="text">
+					</div>
+					<div class="col-3">
+						<label>Second Peak  <br>  (or click Graph): </label>
+					</div>
+					<div class="col-3">
+						 <fieldset>
+							<input class="form-control form-control-sm" style="height: 40px"id="valor2ndPeakGuardar" placeholder="Clic Calculate" readonly="" type="text">
+  						</fieldset>
+					</div>
+				</div>
+
+
+			<div class="form-row col-md-12" style="margin-bottom: 10px">
+					<div class="col-3">
+						<button id="calculate2ndGuardar" style="height: 40px"type="button" class="btn btn-success btn-sm" >Water Content</button>
+					</div>
+					<div class="col-3">
+						  <fieldset>
+							<input class="form-control form-control-sm" style="height: 40px"id="valorHumedadGuardar" placeholder="Clic Calculate" readonly="" type="text">
+  						</fieldset>
+					</div>
+					<div class="col-6" id="checkBoxGuardarDiv">
+						  <label><input type="checkbox" id="checkBoxGuardar" value="first_checkbox"> Manually select 2nd Peak</label>
+					</div>
+			</div>
+
+			<div class="form-row col-md-12" style="margin-bottom: 10px">
+					<div class="col-3">
+						<button id="calculateEC" style="width: 102px; height: 40px"type="button" class="btn btn-success btn-sm" >EC</button>
+					</div>
+					<div class="col-3">
+						  <fieldset>
+								<input class="form-control form-control-sm" style="height: 40px"id="valorEC" placeholder="Clic Calculate" readonly="" type="text">
+  						</fieldset>
+					</div>
+					<div class="col-6">
+					</div>
+			</div>
+			
+		
+
+
+			<!-- <div >
+				<label id="firstPeak" style="margin-left: 5%;"> Click graph to define 1st peak:    </label>
+				<button type="button" id="save1stPeak" class="btn-warning" style="float: right ;margin-right: 5%;">  Save </button>
+			</div> -->
+      <div > 
+      	   <textarea  id="informacion" placeholder="Comments..." name="textarea" style="width: 90% ; margin-left: 5%;"" ></textarea>
+      </div>
+      <div class="modal-footer">
+        <button id="cerrarBtn" type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+        <button type="button" id="guardar" class="btn  btn-success btn-sm" data-dismiss="modal">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!--  -------------modal para mostrar la onda (modal2)---------------------- -->
+
+<div class="modal fade bd-example-modal-xl" id="modal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="labelOnda">Muestra de la onda</h5>
+        <button id="xMostrar" type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span  aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div>
+            <button id="configOndaMostrar" style="float:right"type="button"  class="btn btn-primary btn-sm"  data-toggle="modal"  data-backdrop="static" data-keyboard="false" data-target="#modalMuestraConfig">Configuration</button>
+      </div>
+            
+<!--       <div class="modal-body" > -->
+<!--         <h4>Gráfica</h4> -->
+<!--       </div> -->
+			<div id="divGraph2"></div>
+			
+				<div class="form-row col-md-12" >
+					<div class="col-3">
+						<label >First Peak: </label>
+					</div>
+					<div class="col-3">
+							<input class="form-control form-control-sm" id="firstPeakMostrar" placeholder="Click Graph" type="text">
+					</div>
+					<div class="col-3">
+						<label>Second Peak: </label>
+					</div>
+					<div class="col-3">
+						 <fieldset>
+							<input class="form-control form-control-sm" id="valor2ndPeakMostrar" placeholder="Clic Calculate" readonly="" type="text">
+  						</fieldset>
+					</div>
+				</div>
+			
+			
+			
+			
+			
+
+			
+			<div class="form-row col-md-12" style="margin-top: 10px">
+					<div class="col-3">
+						<button id="calculate2ndMostrar" ype="button" class="btn btn-success btn-sm" >Water content</button>
+					</div>
+					<div class="col-3">
+						  <fieldset>
+								<input class="form-control form-control-sm" id="valorHumedadMostrar" placeholder="Clic Calculate" readonly="" type="text">
+  						</fieldset>
+					</div>
+					<div class="col-6" id="checkBoxMostrarDiv">
+						  <label><input style="margin-top: 8px" type="checkbox" id="checkBoxMostrar" value="first_checkbox"> Manually select 2nd Peak</label>
+					</div>
+			</div>
+			
+			<div class="form-row col-md-12" style="margin-bottom: 10px">
+				<div class="col-6">
+					<label style="float: right"><h5>EC : </h5> </label>
+				</div>
+				<div class="col-6">
+					<label  id="valorECMostrar"><h5>Not Calculated  </h5> </label>
+				</div>
+			</div>
+			
+			
+			
+      <div > 
+      	   <textarea  id="informacion2" placeholder="Information... " name="textarea" style="width: 90% ; margin-left: 5%" ></textarea>
+      </div>
+      <div class="modal-footer">
+        <button id="cerrarBtn2" type="button" class="btn btn-primary btn-sm" data-dismiss="modal">Close</button>
+        <button id="eliminarBtn2" type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Delete</button>
+        <button type="button" id="guardarBtn2" class="btn  btn-success btn-sm" data-dismiss="modal">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ----------- modal configuración de la onda  (modalConfig)----------------- -->
+
+
+<div class="modal fade bd-example-modal-xl" id="modalConfig" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 id="exampleModalLabel">Project Configuration</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span id="xConfig" aria-hidden="true">&times;</span>
+        </button>
+			</div>
+
+			
+
+
+			<div style="margin-bottom: 10px">
+
+
+
+				<!-- <form id="formConfig" method="POST"  >  -->
+				<div class="form-row col-md-12">
+					<div class="col-6"> 
+						<label>
+							Select configuration:   
+						</label>
+      	   <select class="form-control form-control-sm" id="configModal" name="configModal">
+					</select>
+					</div>
+					<div class="col-6"> 
+						<label>
+							Project name:   
+						</label>
+      	   <input type=text  id="configName" class="form-control form-control-sm" name="configName" placeholder="Configuration name"  >
+					</div>
+				</div>
+
+						<div class="form-row col-md-12">
+							<div class="col-4">
+								<label>
+									Cursor 
+								</label>
+									<input type=number step="0.01" class="form-control form-control-sm" id="cableLength" name="cableLength"value=3.38 min=0 max=200> 
+							</div>
+							<div class="col-4">
+										<label>
+											Dist/Div
+										</label>	
+										<input type=number step="0.01" class="form-control form-control-sm" id="windowLength" name="windowLength"value=1.0 min=0 max=200> 
+							</div>
+							<div class="col-4">
+										<label>
+												Constant K
+										</label>	
+										<input type=number step="0.01" class="form-control form-control-sm" id="constantK" name="constantK"value=1.00 min=0 max=200> 
+										<input type=number style="visibility:hidden;position:absolute"class="form-control form-control-sm" id="numberPoints" name="numberPoints" value=251 min=1 max=5000> 
+							</div>
+						</div>
+
+						<div class="form-row col-md-12">
+							<div class="col-4">
+								<label>
+									&rho;<sub>sc</sub>
+								</label>
+									<input type=number step="0.01" class="form-control form-control-sm" id="rhoSC" name="rhoSC"value=-1.00 min=0 max=200> 
+									<input type=number style="visibility:hidden;position:absolute"class="form-control form-control-sm" id="probeCell" name="probeCell" value=1 min=0 max=3> 
+									
+							</div>
+							<div class="col-4">
+										<label>
+											&rho;<sub>air</sub>
+										</label>	
+										<input type=number step="0.01" class="form-control form-control-sm" id="rhoAir" name="rhoAir"value=1.00 min=0 max=200> 
+										<input type=number style="visibility:hidden;position:absolute" step="0.01" class="form-control form-control-sm" id="probeOffset" name="probeOffset"value=0.09 min=0 max=2> 
+							</div>
+							<div class="col-4">
+										<label>
+											Probe length
+										</label>	
+										<input type=number step="0.01"class="form-control form-control-sm" id="probeLength" name="probeLength" value=0.3 min=0 max=5> 
+							</div>
+						</div>
+
+
+						<div class="form-row col-md-12">
+							<div class="col-4">
+										<label>
+											Average points
+										</label>	
+										<input type=number class="form-control form-control-sm" id="averagePoints" name="averagePoints" value=1 min=1 max=32> 
+							</div>
+							<div class="col-4">
+										<label>
+											Vp 
+										</label>	
+										<input type=number step="0.01" class="form-control form-control-sm" id="vp" name="vp"value=0.99 min=0 max=1> 
+							</div>
+							<div class="col-4">
+										<button id="refreshConfig"  style="margin-top:30px"type="button" class="btn btn-info btn-sm" >Refresh</button>
+							</div>
+							
+						</div>
+					 <!-- </form> -->
+			</div>
+			
+			<div id="loadingConfig">
+				 <div class="d-flex align-items-center"  style=" margin-left: 15px; width: 90%" >
+				   	<div id="textoSpinConfig"><strong > <h4>Aquaring waveform... </h4> </strong></div>
+				 	<div class="spinner-border ml-auto" id="spin" role="status" ></div>
+				</div>
+			</div>
+
+			<div id="divGraphConfig"></div>
+			
+			<div class="form-row col-md-12">
+				<div class="col-6">
+						<label style="float: right">First Peak <br>  (or click Graph): </label>
+					</div>
+					<div class="col-4">
+						<input class="form-control form-control-sm" style="height: 40px"id="firstPeakConfig" placeholder="Click Graph" >
+					</div>
+			</div>
+
+      <div class="modal-footer">
+				<button id="cerrarBtnConfig" type="button" class="btn btn-primary btn-sm" data-dismiss="modal">Close</button>
+				<button type="button" id="borrarBtnConfig" class="btn  btn-danger btn-sm" >Delete Config</button>
+        <button type="button" id="guardarBtnConfig" class="btn  btn-success btn-sm" >Save Config</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script src= "js/scriptMedicion.js" type="text/javascript"> </script> 
+<!-- <script src="js/scritpGraph.js"></script>  -->
+
+<!-- --------------------Modal para mostrar configuracióon--------------------------------------------------------------- -->
+
+<div class="modal fade bd-example-modal-xl" id="modalMuestraConfig" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Configuration</h5>
+        <button id="xMuestraConfig" type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span  aria-hidden="true">&times;</span>
+        </button>
+      </div>
+	<div class="form-row col-md-12">
+							<div class="col-4">
+								<label>
+									Cursor 
+								</label>
+									<input type=number step="0.01" readonly="" class="form-control form-control-sm" id="cableLengthCM" name="cableLengthCM"value=3.38 min=0 max=200> 
+							</div>
+							<div class="col-4">
+										<label>
+											Dist/Div
+										</label>	
+										<input type=number step="0.01"  readonly="" class="form-control form-control-sm" id="windowLengthCM" name="windowLengthCM"value=1.0 min=0 max=200> 
+							</div>
+							<div class="col-4">
+										<label>
+												Constant K
+										</label>	
+										<input type=number step="0.01" class="form-control form-control-sm" id="constantKCM" name="constantKCM"value=1.00 min=0 max=200> 
+										<input type=number style="visibility:hidden;position:absolute"class="form-control form-control-sm" id="numberPointsCM" name="numberPointsCM" value=251 min=1 max=5000> 
+							</div>
+						</div>
+
+						<div class="form-row col-md-12">
+							<div class="col-4">
+								<label>
+									&rho;<sub>sc</sub>
+								</label>
+									<input type=number step="0.01" class="form-control form-control-sm" id="rhoSCCM" name="rhoSCCM"value=-1.00 min=0 max=200> 
+									<input type=number style="visibility:hidden;position:absolute"class="form-control form-control-sm" id="probeCellCM" name="probeCellCM" value=1 min=0 max=3> 
+									
+							</div>
+							<div class="col-4">
+										<label>
+											&rho;<sub>air</sub>
+										</label>	
+										<input type=number step="0.01" class="form-control form-control-sm" id="rhoAirCM" name="rhoAirCM"value=1.00 min=0 max=200> 
+										<input type=number style="visibility:hidden;position:absolute" step="0.01" class="form-control form-control-sm" id="probeOffsetCM" name="probeOffsetCM"value=0.09 min=0 max=2> 
+							</div>
+							<div class="col-4">
+										<label>
+											Probe length
+										</label>	
+										<input type=number step="0.01"class="form-control form-control-sm" id="probeLengthCM" name="probeLengthCM" value=0.3 min=0 max=5> 
+							</div>
+						</div>
+
+
+						<div class="form-row col-md-12">
+							<div class="col-4">
+										<label>
+											Average points
+										</label>	
+										<input type=number class="form-control form-control-sm" id="averagePointsCM"  readonly="" name="averagePointsCM" value=1 min=1 max=32> 
+							</div>
+							<div class="col-4">
+										<label>
+											Vp 
+										</label>	
+										<input type=number step="0.01" class="form-control form-control-sm" id="vpCM" readonly=""name="vpCM"value=0.99 min=0 max=1> 
+							</div>
+							<div class="col-4">
+								<label>
+									First Peak
+								</label>	
+										<input type=number step="0.01" class="form-control form-control-sm" id="firstPeakCM"readonly="" name="firstPeakCM" value=0.99 min=0 max=1> 
+							</div>
+							
+						</div>
+      <div class="modal-footer">
+        <button id="cerrarBtn2" type="button" class="btn btn-primary btn-sm" data-dismiss="modal">Close</button>
+        <button type="button" id="guardarBtn2" class="btn  btn-success btn-sm" data-dismiss="modal">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
