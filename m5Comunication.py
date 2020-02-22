@@ -62,8 +62,9 @@ def getWaveForm(ser):#si esperamos antes de pedir la onda ser.any()!=<bound meth
         M5TextBox(24, 134, "Cant recive wave. Retrying", lcd.FONT_DejaVu18,0xFFFFFF, rotate=0)
         return "Error"+ str(header[1])
     M5TextBox(100, 120, "Done", lcd.FONT_DejaVu18,0xFFFFFF, rotate=0)
-      
+    
     data = ser.read()
+    time.sleep(0.1)
     
     while ser.any()>0: 
       data+=ser.read()
@@ -99,21 +100,37 @@ def peticion(ser, pe):
             time.sleep(0.1)
             i+=1
         recibido=ser.readline()
+        if(str(recibido)[3]!='$'):
+            M5TextBox(24, 134, "Error sending configuration", lcd.FONT_DejaVu18,0xFFFFFF, rotate=0)
+            return False
         lcd.print('.')
         time.sleep(0.3)
+        return True
     except SerialException():
         M5TextBox(24, 134, "Cant configurate", lcd.FONT_DejaVu18,0xFFFFFF, rotate=0)
+        return False
+
 
 def configEC(ser): 
-    peticion(ser, ABRT)
-    peticion(ser, darValor(SVP, 0.99))
-    peticion(ser, darValor(SNAV,1))
-    peticion(ser, darValor(SPLR,0.3))
-    peticion(ser, darValor(SPRO,0.09))
-    peticion(ser, darValor(SPCC,1))
-    peticion(ser, darValor(SDIS,0))
-    peticion(ser, darValor(SPNT,251.0000000))
-    peticion(ser, darValor(SWLN,50))
+    if(not peticion(ser, ABRT)):
+      return False
+    if(not peticion(ser, darValor(SVP, 0.99))):
+      return False
+    if(not peticion(ser, darValor(SNAV,1))):
+      return False
+    if(not peticion(ser, darValor(SPLR,0.3))):
+      return False
+    if(not peticion(ser, darValor(SPRO,0.09))):
+      return False
+    if(not peticion(ser, darValor(SPCC,1))):
+      return False
+    if(not peticion(ser, darValor(SDIS,0))):
+      return False
+    if(not peticion(ser, darValor(SPNT,251.0000000))):
+      return False
+    if(not peticion(ser, darValor(SWLN,50))):
+      return False
+    return True
     
 
 def requestToJson(req): 
@@ -121,16 +138,26 @@ def requestToJson(req):
     return urldecode(datos)
   
 def configTdr100(json):
-    peticion(ser, ABRT)
+    if(not peticion(ser, ABRT)):
+      return False
     dic=ujson.loads(json)
-    peticion(ser, darValor(SVP, dic['vp']))
-    peticion(ser, darValor(SNAV,dic['averagePoints']))
-    peticion(ser, darValor(SPLR,dic['probeLength']))
-    peticion(ser, darValor(SPRO,dic['probeOffset']))
-    peticion(ser, darValor(SPCC,dic['probeCell']))
-    peticion(ser, darValor(SDIS,dic['cableLength']))
-    peticion(ser, darValor(SPNT,dic['numberPoints']))
-    peticion(ser, darValor(SWLN,dic['windowLength']))
+    if(not peticion(ser, darValor(SVP, dic['vp']))):
+      return False
+    if(not peticion(ser, darValor(SNAV,dic['averagePoints']))):
+      return False
+    if(not peticion(ser, darValor(SPLR,dic['probeLength']))):
+      return False
+    if(not peticion(ser, darValor(SPRO,dic['probeOffset']))):
+      return False
+    if(not peticion(ser, darValor(SPCC,dic['probeCell']))):
+      return False
+    if(not peticion(ser, darValor(SDIS,dic['cableLength']))):
+      return False
+    if(not peticion(ser, darValor(SPNT,dic['numberPoints']))):
+      return False
+    if(not peticion(ser, darValor(SWLN,dic['windowLength']))):
+      return False
+    return True
     
 
 def saveConfig(json):
@@ -324,12 +351,14 @@ while True:
     key=requestToJson(request)
     config=keyConfigJson(key)
     configdic=ujson.loads(config)
-    configTdr100(config)
-    onda=getWaveForm(ser)
-    if onda[0]=="E":
-      datos=dict(error=onda[5:])
+    if(configTdr100(config)):
+      onda=getWaveForm(ser)
+      if onda[0]=="E":
+        datos=dict(error=onda[5:])
+      else:
+        datos=dict(wave=onda,cL=configdic['cableLength'] ,wL=configdic['windowLength'], firstPeak=configdic['firstPeak'])
     else:
-      datos=dict(wave=onda,cL=configdic['cableLength'] ,wL=configdic['windowLength'], firstPeak=configdic['firstPeak'])
+      datos=dict(error='config')
     conn.send('HTTP/1.1 200 OK\n')
     conn.send('Content-Type: application/json\n')
     conn.send('Connection: close\n\n')
@@ -337,17 +366,30 @@ while True:
     conn.close()
 
 
-
+  elif request.find('/configBaudRate') > 0: 
+    valor=requestToJson(request)
+    try:
+      ser.init(int(valor), tx=17, rx=16,bits=8, parity=None, stop=1, timeout=100)
+      datos=dict(send="ok")
+    except:
+      datos=dict(error="Cant change Baudrate")
+    conn.send('HTTP/1.1 200 OK\n')
+    conn.send('Content-Type: application/json\n')
+    conn.send('Connection: close\n\n')
+    conn.sendall(ujson.dumps(datos))
+    conn.close()
 
     
-  elif request.find('/config') > 0:
+  elif request.find('/configOnda') > 0:
     M5TextBox(21, 79, "Aquaring waveform...", lcd.FONT_DejaVu18,0xFFFFFF, rotate=0)
-    configTdr100(requestToJson(request))
-    onda=getWaveForm(ser)
-    if onda[0]=="E":
-      datos=dict(error=onda[5:])
-    else:
-      datos=dict(wave=onda)
+    if(configTdr100(requestToJson(request))):
+      onda=getWaveForm(ser)
+      if onda[0]=="E":
+        datos=dict(error=onda[5:])
+      else:
+        datos=dict(wave=onda)
+    else: 
+      datos=dict(error='config')
     conn.send('HTTP/1.1 200 OK\n')
     conn.send('Content-Type: application/json\n')
     conn.send('Connection: close\n\n')
@@ -379,12 +421,14 @@ while True:
     
   elif request.find('/json/ec.json') > 0:
     M5TextBox(21, 79, "Aquaring EC...", lcd.FONT_DejaVu18,0xFFFFFF, rotate=0)
-    configEC(ser)
-    onda=getWaveForm(ser)
-    if onda[0]=="E":
-      datos=dict(error=onda[5:])
+    if(configEC(ser)):
+      onda=getWaveForm(ser)
+      if onda[0]=="E":
+        datos=dict(error=onda[5:])
+      else:
+        datos=dict(wave=onda,cL=configdic['cableLength'] ,wL=configdic['windowLength'], firstPeak=configdic['firstPeak'])
     else:
-      datos=dict(wave=onda)
+      datos=dict(error='config')
     conn.send('HTTP/1.1 200 OK\n')
     conn.send('Content-Type: application/json\n')
     conn.send('Connection: close\n\n')
@@ -443,6 +487,8 @@ while True:
       datos=f.read(1024)
     f.close()
     conn.close()
+
+
 
 
 
