@@ -1,24 +1,7 @@
 /*TODO
- * Que redibuje 1st peak al cambiar en el campo numérico en configuración y refresh  -- falta comprobar con tdr
- * * EC debajo de water content (que va debajo de 1st peak)  Dejar todos los botones alienados a la izda con letra mas pequeña1st peak --OK
- * Botones close delete save config + pequeños --OK
- * En configuración falta una constante k para calcular ec. Al cambiar el nombre, que se borre el primer pico automáticamente. Aviso si no se define 1st paeak. Quitar probe offset y probe cell y No puntos
- * Rho_sc --> Como el ec en cortocircuito (añadirlos con posiblidad de cambio) -1
- * Rho_air -->  +1
- * Rho --> Es el que se mide con ec y la fórmula
- * Cambiar Boton de 2nd Peak por water content y que calcule la humedad
- 
- * --------En todas las ventanas-------------
  * Para 2nd peak, que calcule la máxima tangente buscando a partir del primer pico  -----A partir del mínimo después del primer pico?
- * Al exportar, poder decir dónde se guarda y renombrar archivo
- * En la web, en la ventana de mostrar, añadir icono de configuración que muestre los datos y que sólo se pueda modificar probe length, k, rho_sc y rho_air
- * 
  */
 
- /* 
- actualizarLabel(onda) pasarle la configuracion (configMedicion.val)
- arreglar añadirF() ---> No guarda los datos de la gráfica
- */
 
 var $table = $('#table')
 var $remove = $('#remove')
@@ -46,28 +29,30 @@ var svg3 = d3.select("#divGraphConfig").append("svg").attr('width', '100%')
 
 var rectaFija;
 var rectaFija2;
-var guardaOnda;
 
+var guardaOnda;
+var guardaEC;
+
+//Variables de Configuracion. TODO Posiblemente será mejor crear una variable config, pero arrastra muchas cosas
 var guardaCL;
 var guardaWL;
-var guardaEC;
 var guardaVp;
 var guardaProbeLength;
 var guardaAvgPoints;
 var guardaRhoAir;
 var guardaRhoSC;
 var guardaConstantK;
-
 var guardaFirstPeak;
+
 var rectasD1;
 var rectasD2;
-var id; 
+var id;
 
 var i;
 
 var a0=-5.3/100;
 var a1=2.92/100;
-var a2=5.5/10000;
+var a2=-5.5/10000;
 var a3=4.3/1000000;
 
 $(document).ready(function() {
@@ -77,6 +62,9 @@ $(document).ready(function() {
 	selectConfig("configModal");
 	selectConfig("selectObtenerModal");
 });
+
+
+
 
 
 // ----------------------------Evento import data
@@ -116,11 +104,16 @@ $('#configOnda').click(function() {
 	$("#checkBoxGuardar").prop("checked", false);
 	$("#checkBoxMostrar").prop("checked", false);
 	rellenarConfig("configMedicion");
+	$('#calcularHumedadConfig').prop('disabled', true); 
 });
+
 
 $( "#firstPeakConfig" ).change(function() { 
 	mostrarFirstPeak(($("#firstPeakConfig").val() - guardaCL) * 340 / guardaWL, rectaFija);
-	});
+	if($('#valorHumedadConfig').val()!=''){
+		rellenaHumedadConfig();
+	}
+});
 
 $('#configModal').change(function() {
 	rellenarConfig("configModal");
@@ -131,7 +124,18 @@ $("#refreshConfig").click(function() {
 	actualizarLabelConfig();
 });
 
+$('#calcularHumedadConfig').click(function(){
+	if($("#firstPeakConfig").val()=='' || $("#firstPeakConfig").val()=='Click Graph' ) 
+		alert('Define First Peak before');  
+	else
+		rellenaHumedadConfig();
+	
+});
+
+
 $("#guardarBtnConfig").click(function() {
+	rectasD1 = undefined;
+	rectasD2 = undefined;
 	i = 0;
 	guardarConfig();
 	selectConfig("configMedicion");
@@ -141,6 +145,8 @@ $("#guardarBtnConfig").click(function() {
 });
 
 $("#borrarBtnConfig").click(function() {
+	rectasD1 = undefined;
+	rectasD2 = undefined;
 	i = 0;
 	eliminarConfig();
 	selectConfig("configMedicion")
@@ -150,10 +156,14 @@ $("#borrarBtnConfig").click(function() {
 });
 
 $("#cerrarBtnConfig").click(function() {
+	rectasD1 = undefined;
+	rectasD2 = undefined;
 	i = 0;
 });
 
 $('#xConfig').click(function() {
+	rectasD1 = undefined;
+	rectasD2 = undefined;
 	i = 0;
 });
 
@@ -161,15 +171,19 @@ $('#xConfig').click(function() {
 
 $("#firstPeak").change(function() {
 	mostrarFirstPeak(($("#firstPeak").val() - guardaCL) * 340 / guardaWL, rectaFija);
-	if($('#valor2ndPeakGuardar').val()!="Not calculated" && $('#valor2ndPeakGuardar').val()!="" && $('#valor2ndPeakGuardar').val()!="Clic Calculate")
-		$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val())));
-		
+	/*if($('#valor2ndPeakGuardar').val()!="Not calculated" && $('#valor2ndPeakGuardar').val()!="" && $('#valor2ndPeakGuardar').val()!="Clic Calculate"){
+		$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
+		$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]);
+	}
+	Si se descomenta esto, calcula la humedad automáticamente al cambiar el valor*/
 });
 
 
 $("#valor2ndPeakGuardar").change(function() {
 	mostrarSecondPeak(($("#valor2ndPeakGuardar").val() - guardaCL) * 340 / guardaWL, rectaFija2);
-	$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val())));
+	/*$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
+	$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]);
+	Si se descomenta esto, calcula la humedad automáticamente al cambiar el valor*/
 });
 
 
@@ -194,13 +208,11 @@ $("#añadir").click(function() {
 
 $("#xGuardar").click(function() {
 	rectasD1 = undefined;
-	// rectaFija=undefined; Veamos si no hace falta. TODO:quitar si no es
-	// necesario
-	// rectaFija2=undefined;
 	rectasD2 = undefined;
 });
 
 $("#refresh").click(function() {
+	cargarConfig();
 	i = 0;
 	rectasD1 = undefined;
 	rectasD2 = undefined;
@@ -234,9 +246,18 @@ $("#calculate2ndGuardar").click(
 				if (rectasD2 == undefined) {
 					rectasD2 = svg1.append("line");
 				}
-				x = tangentes(posInFirstPeak);
-				$("#valor2ndPeakGuardar").val(x.toFixed(3));
-				$("#valorHumedadGuardar").val(waterContent($('#firstPeak').val(),x));
+				
+				if($('#checkBoxGuardar').prop( "checked" )){
+					$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($("#valor2ndPeakGuardar").val()))[0]);
+					$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($("#valor2ndPeakGuardar").val()))[1]);
+				}else{
+					x = tangentes(posInFirstPeak);
+					$("#valor2ndPeakGuardar").val(x.toFixed(3));
+					$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat(x))[0]);
+					$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat(x))[1]);
+					
+				}
+				
 				
 			}
 		});
@@ -245,15 +266,11 @@ $("#guardar").click(function() {
 	añadirF();
 	initTable();
 	rectasD1 = undefined;
-	// rectaFija=undefined;
-	// rectaFija2=undefined;
 	rectasD2 = undefined;
 });
 
 $("#cerrarBtn").click(function() {
 	rectasD1 = undefined;
-	// rectaFija=undefined;
-	// rectaFija2=undefined;
 	rectasD2 = undefined;
 });
 
@@ -263,31 +280,41 @@ $("#cerrarBtn").click(function() {
 $("#firstPeakMostrar").change(function() {
 	guardaFirstPeak=$("#firstPeakMostrar").val();
 	mostrarFirstPeak(($("#firstPeakMostrar").val() - guardaCL) * 340 / guardaWL, rectaFija);
-	if($('#valor2ndPeakMostrar').val()!="Not calculated" && $('#valor2ndPeakMostrar').val()!="" && $('#valor2ndPeakMostrar').val()!="Clic Calculate")
-		$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val())).toFixed(3));
+	/*if($('#valor2ndPeakMostrar').val()!="Not calculated" && $('#valor2ndPeakMostrar').val()!="" && $('#valor2ndPeakMostrar').val()!="Clic Calculate"){
+		$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
+		$("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
+	}
+	Si se descomenta esto, calcula la humedad automáticamente al cambiar el valor*/
 });
 
 
 $("#valor2ndPeakMostrar").change(function() {
 	mostrarSecondPeak(($("#valor2ndPeakMostrar").val() - guardaCL) * 340 / guardaWL, rectaFija2);
-	$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val())).toFixed(3));
+	/*$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
+	$("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
+	Si se descomenta esto, calcula la humedad automáticamente al cambiar el valor*/
 });
 
 
 
 window.operateEvents = {
+		
 	'click .mostrar' : function(e, value, row, index) {
+		$('#muestraConfigForm').hide();
+		$("#configOndaMostrar").html('Show configuration');
+		$("#guardarBtnConfigMostrar").hide();
 		id=row.id;
 		svg2.remove();
 		$("#divGraph2").html("");
 		svg2 = d3.select("#divGraph2").append("svg").attr('width', '100%')
 				.attr("viewBox", `0 0 460 400`).append("g").attr("transform",
 						"translate(" + margin.left + "," + margin.top + ")");
-
-		rellenarMostrar(row);
+		
 		guardaOnda = row.onda;
 		guardaCL = row.cL;
 		guardaWL = row.wL;
+		guardaProbeLength=row.probeLenght;
+		rellenarMostrar(row);
 		graficar(row.onda, svg2, row.cL, row.wL);
 		if (row.firstPeak != "" && row.firstPeak != undefined) {
 			rectaFija = svg2.append("line");
@@ -335,12 +362,20 @@ $("#calculate2ndMostrar").click(
 				if (rectasD2 == undefined) {
 					rectasD2 = svg2.append("line");
 				}
-				x = tangentes(posInFirstPeak);
-				$("#valor2ndPeakMostrar").val(x.toFixed(3));
-				$('#valorHumedadMostrar').val(waterContent($('#firstPeakMostrar').val(),x).toFixed(3));
+				if($("#checkBoxMostrar").prop("checked"))
+					x=$('#valor2ndPeakMostrar').val();
+				else{
+					x = tangentes(posInFirstPeak);
+					$("#valor2ndPeakMostrar").val(x.toFixed(3));
+				}
+				$('#valorHumedadMostrar').val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat(x))[0].toFixed(3));
+				$('#valorEpsilonMostrar').val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat(x))[1].toFixed(3));
 			}
 
 		});
+
+
+
 
 $("#guardarBtn2").click(function() {
 	rectasD1 = undefined;
@@ -353,6 +388,8 @@ $("#guardarBtn2").click(function() {
 	data.secondPeak = $('#valor2ndPeakMostrar').val();
 	data.info = $('#informacion2').val();
 	data.humedad=$('#valorHumedadMostrar').val();
+	data.epsilon=$('#valorEpsilonMostrar').val();
+	data.ec=$('#valorECMostrar').val();
 	localStorage.setItem(id, JSON.stringify(data));
 	initTable();
 });
@@ -380,23 +417,77 @@ $("#eliminarBtn2").click(function() {
 
 
 $("#configOndaMostrar").click(function() {
-	$('#cableLengthCM').val(guardaCL);
-	$('#windowLengthCM').val(guardaWL);
-	$('#constantKCM').val(guardaConstantK);
-	$('#rhoSCCM').val(guardaRhoSC);
-	$('#rhoAirCM').val(guardaRhoAir);
-	$('#averagePointsCM').val(guardaAvgPoints);
-	$('#vpCM').val(guardaVp);
-	$('#firstPeakCM').val(guardaFirstPeak);
+	if($("#muestraConfigForm").is(':hidden')){
+		$("#configOndaMostrar").html('Hide configuration');
+		$("#muestraConfigForm").show();
+		$("#guardarBtnConfigMostrar").show();
+		data=JSON.parse(localStorage.getItem(id));
+		$('#cableLengthCM').val(data.cL);
+		$('#windowLengthCM').val(data.wL);
+		$('#constantKCM').val(data.constantK);
+		$('#rhoSCCM').val(data.rhoSC);
+		$('#rhoAirCM').val(data.rhoAir);
+		$('#averagePointsCM').val(data.avgPoints);
+		$('#probeLengthCM').val(data.probeLenght);
+		$('#vpCM').val(data.vp);
+		$('#firstPeakCM').val(data.firstPeak);
+	}else{
+		$("#configOndaMostrar").html('Show configuration');
+		$("#guardarBtnConfigMostrar").hide();
+		$("#muestraConfigForm").hide();
+	}
+		
+
+});
+
+$("#guardarBtnConfigMostrar").click(function() {
+	alert('aa');
+	data=JSON.parse(localStorage.getItem(id));
+	data.constantK=$('#constantKCM').val();
+	guardaProbeLength=$('#probeLengthCM').val();
+	guardaConstantK=data.constantK;
+	data.rhoSC=$('#rhoSCCM').val();
+	data.rhoAir=$('#rhoAirCM').val();
+	data.probeLenght=$('#probeLengthCM').val();
+	localStorage.setItem(id, JSON.stringify(data));
 	
+	if($('#valorHumedadMostrar')!=''){
+		$('#valorHumedadMostrar').val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
+		$('#valorEpsilonMostrar').val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
+		}
+	if($('#valorECMostrar').val!=''){
+		$('#valorECMostrar').val(valorEC(data.graphEC, parseFloat(data.rhoAir), parseFloat(data.rhoSC)));
+	}
 });
 
 
 
 					//---------------------boton export
 	
-$('#volcarConfig').click(function() {
-	volcarConfig();
+//$('#volcarConfig').click(function() {
+//	volcarConfig();
+//});
+$('#volcarConfigParcial').click(function() {
+	volcarConfigParcial();
+});
+
+
+					//-----------------------Dispositivo y baudios
+
+$('#baudiosTDR').change(function(){
+	if($("#tdr100").is(':checked')){
+		cambiarBaudios($('#baudiosTDR').val());
+	}else{
+		alert('Select TDR100 decive');
+		$('#baudiosTDR').val(9600);
+	}
+});
+
+
+$('#dispositivo input[type=radio]').change(function(){
+	if($("#tektronix").is(':checked')){
+		alert('Falta implementar para Tektronix');
+	}
 });
 
 
@@ -404,6 +495,8 @@ $('#volcarConfig').click(function() {
 
 //					--------------------------resto funciones
 var rango = [];
+
+
 
 function rellenarConfig(nombre) {
 	$('#loadingConfig').hide();
@@ -423,25 +516,43 @@ function rellenarConfig(nombre) {
 		$('#rhoSC').val(config['rhoSC']);
 		$('#rhoAir').val(config['rhoAir']);
 		$('#firstPeakConfig').val(config['firstPeak']);
+		$('#valorHumedadConfig').val('');
+		$('#valorEpsilonConfig').val('');
+		svg3.remove();
 	});
 
 }
 
+function rellenaHumedadConfig(){
+	guardaProbeLength=$('#probeLength').val();
+	guardaCL=parseFloat($('#cableLength').val());
+	guardaWL=parseFloat($('#windowLength').val());
+	var posInFirstPeak = (parseFloat($('#firstPeakConfig').val()) - guardaCL) * 251 / guardaWL;
+	if(rectasD1==undefined) rectasD1=svg3.append("line");
+	if(rectasD2==undefined) rectasD2=svg3.append("line");
+	var x=tangentes(posInFirstPeak);
+	$('#valorHumedadConfig').val(waterContent(parseFloat($('#firstPeakConfig').val()) ,parseFloat(x))[0].toFixed(3));
+	$('#valorEpsilonConfig').val(waterContent(parseFloat($('#firstPeakConfig').val()) ,parseFloat(x))[1].toFixed(3));
+}
+
+
+
+
 function cargarConfig(){
 	$.getJSON('datosConfig', function(datos) {
-		var config = datos[$("#configMedicion").val()];
-
+		var config = datos[$("#selectObtenerModal").val()];
 		guardaCL=config['cableLength'];
 		guardaWL=config['windowLength'];
 		guardaProbeLength=config['probeLength'];
 		guardaConstantK=config['constantK'];
+		guardaVp=config['vp'];
 		guardaRhoSC=config['rhoSC'];
 		guardaRhoAir=config['rhoAir'];
 		guardaAvgPoints=config['averagePoints'];
 	});
 }
 
-function selectConfig(nombre) { // Crea despleglable de seleccion desde el
+function selectConfig(nombre) { // Crea desplegable de seleccion desde el
 	// fichero de configuracion
 	$.getJSON('datosConfig', function(datos) {
 		$("#" + nombre).empty();
@@ -461,17 +572,31 @@ $remove.click(function() {
 })
 
 function waterContent(first,second){
-	var ks=1.01*(100*(second-first)/10)*(100*(second-first)/10);  // lo que
-																	// ahora
-																	// pone 10
-																	// debera
-																	// ser el
-																	// tamaño de
-																	// la
-																	// varilla?
-	return (a0+ks*a1+ks*ks*a2+ks*ks*ks*a3);
+	var ks=1.01*(100*(second-first)/10)*(100*(second-first)/(guardaProbeLength*100));  
+	//alert(ks);
+	return ([ a0+ks*a1+ks*ks*a2+ks*ks*ks*a3, ks]);
 	
 }
+
+
+function cambiarBaudios(valor){
+	$.post(
+			'/configBaudRate',
+			{
+				myData : valor
+			},
+			function(data) {
+				if (data.error == "" || data.error == undefined) {
+					alert('done');
+					}
+				 else {
+					alert('Cant change BaudRate. Error conexion');
+				}
+			}).fail(function() {
+		alert('Cant change Baudrate wave. Maybe not connected');
+	});
+}
+
 
 function eliminarElto() {
 	if (window.confirm("Sure?")) {
@@ -497,29 +622,43 @@ function download(filename, text) {
 
 	element.style.display = 'none';
 	document.body.appendChild(element);
-
+	
 	element.click();
 
 	document.body.removeChild(element);
 }
 
-function volcarConfig() {
-	download("config.json", JSON.stringify(localStorage)); // Cuando es
-	// JSON
-	// const headers = {
-	// id: 'Identificador',
-	// fecha: 'Fecha',
-	// info: 'Informacion',
-	// config: 'Configuration',
-	// firstPeak: 'First Peak',
-	// ec: "EC",
-	// onda: "Wave",
-	// wL: "Window Length",
-	// cL: "Cable Length"
-	// };
-	// data=JSON.stringify(localStorage);
-	// exportCSVFile(headers, data, 'nombres');
+
+//function volcarConfig() {
+////	alert(browser.downloads.showDefaultFolder());  ----No entiendo porque no puedo  utilizar esto!
+//	  var nombre = prompt("Please enter download filename: ", "Config");
+//	  if (nombre == null || nombre == "") {
+//	    alert("User cancelled the prompt.");
+//	  } else {
+//		  download(nombre+'.json', JSON.stringify(localStorage)); 
+//	  }
+//}
+
+
+function volcarConfigParcial() {
+	var texto='{'; 
+	var id = getIdSelections()
+	id.forEach(function(el) {
+		texto+='"'+el+'":"'+localStorage.getItem(el).replace(/"/g, '\\"')+'"'+',';
+	});
+	texto=texto.slice(0,-1);
+	texto+='}';
+	var nombre = prompt("Please enter download filename: ", "Config");
+	  if (nombre == null || nombre == "") {
+	    alert("User cancelled the prompt.");
+	  } else {
+		  download(nombre+'.json', texto); 
+	  }
+	
+
 }
+
+
 
 function añadirF() {
 
@@ -549,14 +688,16 @@ function añadirF() {
 	obj.graphEC = guardaEC;
 	cargarConfig();
 	obj.wL = guardaWL;
+	obj.vp = guardaVp;
 	obj.cL = guardaCL;
 	obj.rhoAir = guardaRhoAir;
-	obj.rhoEC = guardaRhoSC;
+	obj.rhoSC = guardaRhoSC;
 	obj.probeLenght=guardaProbeLength;
 	obj.avgPoints=guardaAvgPoints;
 	obj.constantK = guardaConstantK;
 	obj.secondPeak = $('#valor2ndPeakGuardar').val();
 	obj.humedad=$('#valorHumedadGuardar').val();
+	obj.epsilon=$('#valorEpsilonGuardar').val();
 	localStorage.setItem(clave, JSON.stringify(obj));
 
 }
@@ -579,7 +720,22 @@ function añadirEC(rango) {
 			graficaEC(guardaEC, svg1);
 			$('#valorEC').val(valorEC(guardaEC, parseFloat(guardaRhoAir), parseFloat(guardaRhoSC)));
 			$('#loading').hide();
-		}else return añadirEC(rango);
+		} else if(data.error=="config"){
+			alert('Cant configure Wave. Error configuration');
+			$('#loading').hide();
+		} else  {
+			if (i <= 5) {
+				i++;
+				return añadirEC(rango);
+			} else{
+				alert('Cant recive wave. So many tryes. Error'
+						+ String(data.error));
+				$('#loading').hide();
+			}
+		}
+	}).fail(function() {
+			alert('Cant recive wave. Maybe not connected');
+			$('#loading').hide();
 		
 	});
 
@@ -600,6 +756,7 @@ function valorEC(puntosEC,rhoAir,rhoSC){
 
 function actualizarLabel() {
 	$('#calculateEC').prop('disabled', true);
+	$('#calculate2ndGuardar').prop('disabled', true);
 	$('#textoSpin').html('<strong > <h4>Aquaring waveform... </h4> </strong>');
 	$('#loading').show();
 
@@ -618,6 +775,7 @@ function actualizarLabel() {
 			function(data) {
 				if (data.error == "" || data.error == undefined) {
 					$('#calculateEC').prop('disabled', false);
+					$('#calculate2ndGuardar').prop('disabled', false);
 					rango = graficar(data.wave, svg1, data.cL, data.wL);
 					guardaOnda = data.wave;
 					guardaWL = data.wL;
@@ -627,13 +785,19 @@ function actualizarLabel() {
 						mostrarFirstPeak((data.firstPeak - data.cL) * 340/ data.wL, rectaFija);
 						$("#firstPeak").val(data.firstPeak);
 					}
-				} else {
+				} else if(data.error=="config"){
+					alert('Cant configure Wave. Error configuration');
+					$('#loading').hide();
+				}
+				else{ 
 					if (i <= 5) {
-						return actualizarLabel();
 						i++;
-					} else
+						return actualizarLabel();
+					} else{
 						alert('Cant recive wave. So many tryes. Error'
-								+ str(data.error));
+								+ String(data.error));
+						$('#loading').hide();
+					}
 				}
 			}).fail(function() {
 		alert('Cant recive wave. Maybe not connected');
@@ -642,7 +806,6 @@ function actualizarLabel() {
 }
 
 function actualizarLabelConfig(onda) {
-
 	$('#loadingConfig').show();
 
 	var config = new Object();
@@ -661,21 +824,31 @@ function actualizarLabelConfig(onda) {
 			.attr("viewBox", `0 0 460 400`).append("g").attr("transform",
 					"translate(" + margin.left + "," + margin.top + ")");
 	$.post(
-		'/config',
+		'/configOnda',
 		{
 			myData : JSON.stringify(config)
 		},
 		function(data) {
 			if (data.error == "" || data.error==undefined) {
+				$('#calcularHumedadConfig').prop('disabled', false); 
 				rango = graficar(data.wave, svg3, config.cableLength,config.windowLength);
+				guardaOnda=data.wave;
+				guardaCL=config.cableLength;
+				guardaWL=config.windowLength;
 				$('#loadingConfig').hide();
-			} else {
+			}  else if(data.error=="config"){
+				alert('Cant configure Wave. Error configuration');
+				$('#loadingConfig').hide();
+			}else {
 				if (i <= 5) {
-					return actualizarLabelConfig();
 					i++;
-				} else
+					return actualizarLabelConfig();
+				} else{
 					alert('Cant recive wave. So many tryes. Error'
-							+ str(data.error));
+							+ String(data.error));
+					$('#loadingConfig').hide();
+				}
+					
 			}
 		}).fail(function() {
 			alert('Cant recive wave. Maybe not connected');
@@ -748,9 +921,9 @@ function rellenarMostrar(row) {
 
 	$("#checkBoxMostrar").prop("checked", false);
 	if (row.ec != "") {
-		$('#valorECMostrar').html('<h5>' + row.ec + '</h5>');
+		$('#valorECMostrar').val( parseFloat(row.ec).toFixed(3) );
 	} else {
-		$('#valorECMostrar').html('<h5>Not Calculated</h5>');
+		$('#valorECMostrar').val('Not Calculated');
 	}
 	if (row.firstPeak != "") {
 		$('#firstPeakMostrar').val(row.firstPeak);
@@ -762,17 +935,15 @@ function rellenarMostrar(row) {
 		$("#valor2ndPeakMostrar").attr("readonly", true);
 		$('#valor2ndPeakMostrar').val('Not calculated');
 		$('#valorHumedadMostrar').val('Not calculated');
+		$('#valorEpsilonMostrar').val('Not calculated');
 		$('#checkBoxMostrarDiv').hide();
 	} else {
 		$("#valor2ndPeakMostrar").attr("readonly", false);
 		$('#valor2ndPeakMostrar').val(row.secondPeak);
-		$('#valorHumedadMostrar').val(waterContent(row.firstPeak,row.secondPeak).toFixed(3));// Convendrá
-																					// que
-																					// sea
-																					// row.watercontent
-																					// o lo
-																					// que
-																					// sea
+		//las dos líneas que vienen a continuación podrían tomar valores sin tener que calcular!
+		$('#valorHumedadMostrar').val(waterContent(row.firstPeak,row.secondPeak)[0].toFixed(3));
+		$('#valorEpsilonMostrar').val(waterContent(row.firstPeak,row.secondPeak)[1].toFixed(3));																			// que
+																				
 		$('#checkBoxMostrarDiv').show();
 
 	}
@@ -831,7 +1002,7 @@ function detailFormatter(index, row) {
 function operateFormatter(value, row, index) {
 	return [
 			'<a class="mostrar" href="javascript:void(0)" title="Mostrar">',
-			'<button type="button" class="btn btn-warning btn-sm" data-toggle="modal"  data-backdrop="static" data-keyboard="false" data-target="#modal2">Icono</button>',
+			'<button type="button" class="btn btn-warning btn-sm" data-toggle="modal"  data-backdrop="static" data-keyboard="false" data-target="#modal2">Results</button>',
 			'</a>  ', ].join('')
 }
 
@@ -888,9 +1059,8 @@ function initTable() {
 
 	$table.on('check.bs.table uncheck.bs.table '
 			+ 'check-all.bs.table uncheck-all.bs.table', function() {
-		$remove
-				.prop('disabled',
-						!$table.bootstrapTable('getSelections').length)
+		$remove.prop('disabled',!$table.bootstrapTable('getSelections').length)
+		$('#volcarConfigParcial').prop('disabled', !$table.bootstrapTable('getSelections').length)
 		selections = getIdSelections()
 	})
 
@@ -985,28 +1155,34 @@ function graficar(onda, svg, cL, wL) {
 			$("#firstPeakMostrar").val(equis.toFixed(2));
 			guardaFirstPeak=$("#firstPeakMostrar").val();
 			$("#firstPeakConfig").val(equis.toFixed(2));
-			if($('#valor2ndPeakGuardar').val()!="Not calculated" && $('#valor2ndPeakGuardar').val()!="" && $('#valor2ndPeakGuardar').val()!="Clic Calculate"
+			/*if($('#valor2ndPeakGuardar').val()!="Not calculated" && $('#valor2ndPeakGuardar').val()!="" && $('#valor2ndPeakGuardar').val()!="Clic Calculate"
 				|| $('#valor2ndPeakMostrar').val()!="Not calculated" && $('#valor2ndPeakMostrar').val()!="" && $('#valor2ndPeakMostrar').val()!="Clic Calculate"){
-					$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val())));
-					$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val())).toFixed(3));
-				}
+					$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
+					$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
+					$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]);
+					$("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
+					Si se descomenta esto, se calcula el valor de humedad al hacer click
+				}*/
 		} else {
 			mostrarSecondPeak((equis - cL) * 340 / wL, rectaFija2);
 			$("#valor2ndPeakGuardar").val(equis.toFixed(2));
 			$("#valor2ndPeakMostrar").val(equis.toFixed(2));
-			$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val())));
-			$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val())).toFixed(3));
+			/*$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
+			$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
+			$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]);
+			$("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
+			Si se descomenta esto, se calcula el valor de humedad al hacer click*/
 		}
 	}
 
+
 	function mousemove() {
-		// recover coordinate we need
 		var x0 = x.invert(d3.mouse(this)[0]);
 		var i = bisect(data, x0, 1);
 		selectedData = data[i]
 		focus.attr("cx", x(selectedData.x)).attr("cy", y(selectedData.y))
-		focusText.html("x:" + selectedData.x + "  -  " + "y:" + selectedData.y)
-				.attr("x", x(selectedData.x) - 40).attr("y",
+		focusText.html(selectedData.x.toFixed(3) )
+				.attr("x", x(selectedData.x) - 20).attr("y",
 						y(selectedData.y) - 15)
 		recta.attr("x1", x(selectedData.x)).attr("y2", 0).attr("x2",
 				x(selectedData.x)).attr("y1", 365);
@@ -1080,6 +1256,7 @@ function tangentes(posFirstPeak) {
 			guardaOnda[posmaxD + 1], minV, rectasD2);
 	mostrarSecondPeak(x, rectaFija2);
 	return (x / 340 * guardaWL + parseFloat(guardaCL));
+	//Devuelve el valor numérico del 2nd Peak
 
 }
 
