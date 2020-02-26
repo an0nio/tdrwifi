@@ -33,16 +33,7 @@ var rectaFija2;
 var guardaOnda;
 var guardaEC;
 
-//Variables de Configuracion. TODO Posiblemente será mejor crear una variable config, pero arrastra muchas cosas
-var guardaCL;
-var guardaWL;
-var guardaVp;
-var guardaProbeLength;
-var guardaAvgPoints;
-var guardaRhoAir;
-var guardaRhoSC;
-var guardaConstantK;
-var guardaFirstPeak;
+var configuration= new Object();
 
 var rectasD1;
 var rectasD2;
@@ -109,10 +100,10 @@ $('#configOnda').click(function() {
 
 
 $( "#firstPeakConfig" ).change(function() { 
-	mostrarFirstPeak(($("#firstPeakConfig").val() - guardaCL) * 340 / guardaWL, rectaFija);
-	if($('#valorHumedadConfig').val()!=''){
-		rellenaHumedadConfig();
-	}
+	mostrarFirstPeak(($("#firstPeakConfig").val() - configuration.cableLength) * 340 / configuration.windowLength, rectaFija);
+//	if($('#valorHumedadConfig').val()!=''){
+//		rellenaHumedadConfig();
+//	}   ------TODO: Preguntar si quiere que cambie la humedad automáticamente al cambiar 1st Peak o está bien así
 });
 
 $('#configModal').change(function() {
@@ -170,7 +161,7 @@ $('#xConfig').click(function() {
 // ------------------------------------- Eventos refresh
 
 $("#firstPeak").change(function() {
-	mostrarFirstPeak(($("#firstPeak").val() - guardaCL) * 340 / guardaWL, rectaFija);
+	mostrarFirstPeak(($("#firstPeak").val() - configuration.cableLength) * 340 / configuration.windowLength, rectaFija);
 	/*if($('#valor2ndPeakGuardar').val()!="Not calculated" && $('#valor2ndPeakGuardar').val()!="" && $('#valor2ndPeakGuardar').val()!="Clic Calculate"){
 		$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
 		$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]);
@@ -180,7 +171,7 @@ $("#firstPeak").change(function() {
 
 
 $("#valor2ndPeakGuardar").change(function() {
-	mostrarSecondPeak(($("#valor2ndPeakGuardar").val() - guardaCL) * 340 / guardaWL, rectaFija2);
+	mostrarSecondPeak(($("#valor2ndPeakGuardar").val() - configuration.cableLength) * 340 / configuration.windowLength, rectaFija2);
 	/*$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
 	$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]);
 	Si se descomenta esto, calcula la humedad automáticamente al cambiar el valor*/
@@ -190,7 +181,7 @@ $("#valor2ndPeakGuardar").change(function() {
 
 $("#añadir").click(function() {
 	i = 0;
-	cargarConfig();
+	cargarConfigM5();
 	$("#checkBoxGuardar").prop("checked", false);
 	$("#checkBoxMostrar").prop("checked", false);
 	$('#checkBoxGuardarDiv').hide();
@@ -212,7 +203,7 @@ $("#xGuardar").click(function() {
 });
 
 $("#refresh").click(function() {
-	cargarConfig();
+	cargarConfigM5();
 	i = 0;
 	rectasD1 = undefined;
 	rectasD2 = undefined;
@@ -237,8 +228,8 @@ $("#calculate2ndGuardar").click(
 			} else {
 				$('#checkBoxGuardarDiv').show();
 				$("#valor2ndPeakGuardar").attr("readonly", false);
-				var posInFirstPeak = ($('#firstPeak').val() - guardaCL) * 251 
-						/ guardaWL;
+				var posInFirstPeak = ($('#firstPeak').val() - configuration.cableLength) * 251 
+						/ configuration.windowLength;
 
 				if (rectasD1 == undefined) {
 					rectasD1 = svg1.append("line");
@@ -248,13 +239,13 @@ $("#calculate2ndGuardar").click(
 				}
 				
 				if($('#checkBoxGuardar').prop( "checked" )){
-					$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($("#valor2ndPeakGuardar").val()))[0]);
-					$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($("#valor2ndPeakGuardar").val()))[1]);
+					$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($("#valor2ndPeakGuardar").val()))[0].toFixed(3));
+					$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($("#valor2ndPeakGuardar").val()))[1].toFixed(3));
 				}else{
 					x = tangentes(posInFirstPeak);
 					$("#valor2ndPeakGuardar").val(x.toFixed(3));
-					$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat(x))[0]);
-					$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat(x))[1]);
+					$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat(x))[0].toFixed(3));
+					$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat(x))[1].toFixed(3));
 					
 				}
 				
@@ -278,8 +269,8 @@ $("#cerrarBtn").click(function() {
 
 
 $("#firstPeakMostrar").change(function() {
-	guardaFirstPeak=$("#firstPeakMostrar").val();
-	mostrarFirstPeak(($("#firstPeakMostrar").val() - guardaCL) * 340 / guardaWL, rectaFija);
+	configuration.firstPeak=$("#firstPeakMostrar").val();
+	mostrarFirstPeak(($("#firstPeakMostrar").val() - configuration.cableLength) * 340 / configuration.windowLength, rectaFija);
 	/*if($('#valor2ndPeakMostrar').val()!="Not calculated" && $('#valor2ndPeakMostrar').val()!="" && $('#valor2ndPeakMostrar').val()!="Clic Calculate"){
 		$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
 		$("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
@@ -289,7 +280,7 @@ $("#firstPeakMostrar").change(function() {
 
 
 $("#valor2ndPeakMostrar").change(function() {
-	mostrarSecondPeak(($("#valor2ndPeakMostrar").val() - guardaCL) * 340 / guardaWL, rectaFija2);
+	mostrarSecondPeak(($("#valor2ndPeakMostrar").val() - configuration.cableLength) * 340 / configuration.windowLength, rectaFija2);
 	/*$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
 	$("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
 	Si se descomenta esto, calcula la humedad automáticamente al cambiar el valor*/
@@ -311,21 +302,19 @@ window.operateEvents = {
 						"translate(" + margin.left + "," + margin.top + ")");
 		
 		guardaOnda = row.onda;
-		guardaCL = row.cL;
-		guardaWL = row.wL;
-		guardaProbeLength=row.probeLenght;
+		configuration=row.configuration;
 		rellenarMostrar(row);
-		graficar(row.onda, svg2, row.cL, row.wL);
-		if (row.firstPeak != "" && row.firstPeak != undefined) {
+		graficar(row.onda, svg2, row.configuration.cableLength, row.configuration.windowLength);
+		if (row.configuration.firstPeak != "" && row.configuration.firstPeak != undefined) {
 			rectaFija = svg2.append("line");
-			mostrarFirstPeak((row.firstPeak - row.cL) * 340 / row.wL, rectaFija);
+			mostrarFirstPeak((row.configuration.firstPeak- row.configuration.cableLength) * 340 / row.configuration.windowLength, rectaFija);
 		}
 		if (row.secondPeak != "" && row.secondPeak != undefined) {
 			rectaFija2 = svg2.append("line");
-			mostrarSecondPeak((row.secondPeak - row.cL) * 340 / row.wL,
+			mostrarSecondPeak((row.secondPeak - row.configuration.cableLength) * 340 / row.configuration.windowLength,
 					rectaFija2);
 		}
-		if (row.graphEC != "") {
+		if (row.graphEC != "" && row.graphEC!=undefined) {
 			graficaEC(row.graphEC, svg2);
 		}
 
@@ -354,8 +343,8 @@ $("#calculate2ndMostrar").click(
 			} else {
 				$('#checkBoxMostrarDiv').show();
 				$("#valor2ndPeakMostrar").attr("readonly", false);
-				var posInFirstPeak = ($('#firstPeakMostrar').val() - guardaCL)
-						* 251 / guardaWL;
+				var posInFirstPeak = ($('#firstPeakMostrar').val() - configuration.cableLength)
+						* 251 / configuration.windowLength;
 				if (rectasD1 == undefined) {
 					rectasD1 = svg2.append("line");
 				}
@@ -383,8 +372,7 @@ $("#guardarBtn2").click(function() {
 	rectaFija2 = undefined;
 	rectasD2 = undefined;
 	data=JSON.parse(localStorage.getItem(id));
-	data.firstPeak = $('#firstPeakMostrar').val();
-	guardaFirstPeak=$('#firstPeakMostrar').val();
+	data.configuration.firstPeak = $('#firstPeakMostrar').val();
 	data.secondPeak = $('#valor2ndPeakMostrar').val();
 	data.info = $('#informacion2').val();
 	data.humedad=$('#valorHumedadMostrar').val();
@@ -422,40 +410,40 @@ $("#configOndaMostrar").click(function() {
 		$("#muestraConfigForm").show();
 		$("#guardarBtnConfigMostrar").show();
 		data=JSON.parse(localStorage.getItem(id));
-		$('#cableLengthCM').val(data.cL);
-		$('#windowLengthCM').val(data.wL);
-		$('#constantKCM').val(data.constantK);
-		$('#rhoSCCM').val(data.rhoSC);
-		$('#rhoAirCM').val(data.rhoAir);
-		$('#averagePointsCM').val(data.avgPoints);
-		$('#probeLengthCM').val(data.probeLenght);
-		$('#vpCM').val(data.vp);
-		$('#firstPeakCM').val(data.firstPeak);
+		$('#cableLengthCM').val(configuration.cableLength);
+		$('#windowLengthCM').val(configuration.windowLength);
+		$('#constantKCM').val(configuration.constantK);
+		$('#rhoSCCM').val(configuration.rhoSC);
+		$('#rhoAirCM').val(configuration.rhoAir);
+		$('#averagePointsCM').val(configuration.averagePoints);
+		$('#probeLengthCM').val(configuration.probeLength);
+		$('#vpCM').val(configuration.vp);
+		$('#firstPeakCM').val(configuration.firstPeak);
 	}else{
 		$("#configOndaMostrar").html('Show configuration');
 		$("#guardarBtnConfigMostrar").hide();
 		$("#muestraConfigForm").hide();
 	}
-		
-
 });
 
 $("#guardarBtnConfigMostrar").click(function() {
-	alert('aa');
 	data=JSON.parse(localStorage.getItem(id));
-	data.constantK=$('#constantKCM').val();
-	guardaProbeLength=$('#probeLengthCM').val();
-	guardaConstantK=data.constantK;
-	data.rhoSC=$('#rhoSCCM').val();
-	data.rhoAir=$('#rhoAirCM').val();
-	data.probeLenght=$('#probeLengthCM').val();
+	
+	data.configuration.constantK=$('#constantKCM').val();
+	configuration.constantK=$('#constantKCM').val();
+	data.configuration.rhoSC=$('#rhoSCCM').val();
+	configuration.rhoSC=$('#rhoSCCM').val();
+	data.configuration.rhoAir=$('#rhoAirCM').val();
+	configuration.rhoAir=$('#rhoAirCM').val();
+	data.configuration.probeLength=$('#probeLengthCM').val();
+	configuration.probeLength=$('#probeLengthCM').val();
 	localStorage.setItem(id, JSON.stringify(data));
 	
 	if($('#valorHumedadMostrar')!=''){
 		$('#valorHumedadMostrar').val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
 		$('#valorEpsilonMostrar').val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
 		}
-	if($('#valorECMostrar').val!=''){
+	if($('#valorECMostrar').val()!='' && $('#valorECMostrar').val()!=undefined && !isNaN($('#valorECMostrar').val())){
 		$('#valorECMostrar').val(valorEC(data.graphEC, parseFloat(data.rhoAir), parseFloat(data.rhoSC)));
 	}
 });
@@ -501,33 +489,43 @@ var rango = [];
 function rellenarConfig(nombre) {
 	$('#loadingConfig').hide();
 	$.getJSON('datosConfig', function(datos) {
-		var config = datos[$("#" + nombre).val()];
+		var configFich = datos[$("#" + nombre).val()];
 		$('[name=configModal] option').filter(function() {
 			return ($(this).text() == String($("#" + nombre).val()));
 		}).prop('selected', true);
-		$('#configName').val(config['configName']);
-		$('#cableLength').val(config['cableLength']);
-		$('#windowLength').val(config['windowLength']);
-		$('#numberPoints').val(config['numberPoints']);
-		$('#probeCell').val(config['probeCell']);
-		$('#probeOffset').val(config['probeOffset']);
-		$('#probeLength').val(config['probeLength']);
-		$('#constantK').val(config['constantK']);
-		$('#rhoSC').val(config['rhoSC']);
-		$('#rhoAir').val(config['rhoAir']);
-		$('#firstPeakConfig').val(config['firstPeak']);
+		$('#configName').val(configFich['configName']);
+		$('#cableLength').val(configFich['cableLength']);
+		$('#windowLength').val(configFich['windowLength']);
+		$('#numberPoints').val(configFich['numberPoints']);
+		$('#probeCell').val(configFich['probeCell']);
+		$('#probeOffset').val(configFich['probeOffset']);
+		$('#probeLength').val(configFich['probeLength']);
+		$('#constantK').val(configFich['constantK']);
+		$('#rhoSC').val(configFich['rhoSC']);
+		$('#rhoAir').val(configFich['rhoAir']);
+		$('#firstPeakConfig').val(configFich['firstPeak']);
 		$('#valorHumedadConfig').val('');
 		$('#valorEpsilonConfig').val('');
+		configuration.name=configFich['configName'];
+		configuration.cableLength=configFich['cableLength'];
+		configuration.windowLength=configFich['windowLength'];
+		configuration.probeLength=configFich['probeLength'];
+		configuration.constantK=configFich['constantK'];
+		configuration.vp=configFich['vp'];
+		configuration.rhoSC=configFich['rhoSC'];
+		configuration.rhoAir=configFich['rhoAir'];
+		configuration.averagePoints=configFich['averagePoints'];
+		configuration.probeCell=configFich['probeCell'];
+		configuration.numberPoints=configFich['numberPoints'];
+		configuration.probeOffset=configFich['probeOffset'];
+		configuration.firstPeak=configFich['firstPeak'];
 		svg3.remove();
 	});
 
 }
 
 function rellenaHumedadConfig(){
-	guardaProbeLength=$('#probeLength').val();
-	guardaCL=parseFloat($('#cableLength').val());
-	guardaWL=parseFloat($('#windowLength').val());
-	var posInFirstPeak = (parseFloat($('#firstPeakConfig').val()) - guardaCL) * 251 / guardaWL;
+	var posInFirstPeak = (parseFloat($('#firstPeakConfig').val()) - configuration.cableLength) * 251 / configuration.windowLength;
 	if(rectasD1==undefined) rectasD1=svg3.append("line");
 	if(rectasD2==undefined) rectasD2=svg3.append("line");
 	var x=tangentes(posInFirstPeak);
@@ -538,17 +536,24 @@ function rellenaHumedadConfig(){
 
 
 
-function cargarConfig(){
+
+
+function cargarConfigM5(){
 	$.getJSON('datosConfig', function(datos) {
-		var config = datos[$("#selectObtenerModal").val()];
-		guardaCL=config['cableLength'];
-		guardaWL=config['windowLength'];
-		guardaProbeLength=config['probeLength'];
-		guardaConstantK=config['constantK'];
-		guardaVp=config['vp'];
-		guardaRhoSC=config['rhoSC'];
-		guardaRhoAir=config['rhoAir'];
-		guardaAvgPoints=config['averagePoints'];
+		var configFich = datos[$("#selectObtenerModal").val()];
+		configuration.name=configFich['configName'];
+		configuration.cableLength=configFich['cableLength'];
+		configuration.windowLength=configFich['windowLength'];
+		configuration.probeLength=configFich['probeLength'];
+		configuration.constantK=configFich['constantK'];
+		configuration.vp=configFich['vp'];
+		configuration.rhoSC=configFich['rhoSC'];
+		configuration.rhoAir=configFich['rhoAir'];
+		configuration.averagePoints=configFich['averagePoints'];
+		configuration.probeCell=configFich['probeCell'];
+		configuration.numberPoints=configFich['numberPoints'];
+		configuration.probeOffset=configFich['probeOffset'];
+		configuration.firstPeak=configFich['firstPeak'];
 	});
 }
 
@@ -572,7 +577,7 @@ $remove.click(function() {
 })
 
 function waterContent(first,second){
-	var ks=1.01*(100*(second-first)/10)*(100*(second-first)/(guardaProbeLength*100));  
+	var ks=1.01*(100*(second-first)/10)*(100*(second-first)/(configuration.probeLength*100));  
 	//alert(ks);
 	return ([ a0+ks*a1+ks*ks*a2+ks*ks*ks*a3, ks]);
 	
@@ -680,21 +685,11 @@ function añadirF() {
 			+ ((date.getSeconds() < 10) ? ("0" + date.getSeconds()) : date
 					.getSeconds());
 	obj.info = $('#informacion').val();
-	obj.config = $('#selectObtenerModal').val();
-	obj.firstPeak = $('#firstPeak').val();
-	guardaFirstPeak=$('#firstPeak').val();
 	obj.ec = $('#valorEC').val();
 	obj.onda = guardaOnda;
 	obj.graphEC = guardaEC;
-	cargarConfig();
-	obj.wL = guardaWL;
-	obj.vp = guardaVp;
-	obj.cL = guardaCL;
-	obj.rhoAir = guardaRhoAir;
-	obj.rhoSC = guardaRhoSC;
-	obj.probeLenght=guardaProbeLength;
-	obj.avgPoints=guardaAvgPoints;
-	obj.constantK = guardaConstantK;
+	cargarConfigM5();
+	obj.configuration=configuration;
 	obj.secondPeak = $('#valor2ndPeakGuardar').val();
 	obj.humedad=$('#valorHumedadGuardar').val();
 	obj.epsilon=$('#valorEpsilonGuardar').val();
@@ -711,14 +706,14 @@ function añadirEC(rango) {
 	svg1 = d3.select("#divGraph1").append("svg").attr('width', '100%').attr(
 			"viewBox", `0 0 460 400`).append("g").attr("transform",
 			"translate(" + margin.left + "," + margin.top + ")");
-	graficar(guardaOnda, svg1, guardaCL, guardaWL);
-	mostrarFirstPeak(($('#firstPeak').val()-guardaCL)*340/guardaWL,rectaFija);
+	graficar(guardaOnda, svg1, configuration.cableLength, configuration.windowLength);
+	mostrarFirstPeak(($('#firstPeak').val()-configuration.cableLength)*340/configuration.windowLength,rectaFija);
 
 	$.getJSON('json/ec.json', function(data) {
 		if(data.error=="" || data.error==undefined){
 			guardaEC = data.wave;
 			graficaEC(guardaEC, svg1);
-			$('#valorEC').val(valorEC(guardaEC, parseFloat(guardaRhoAir), parseFloat(guardaRhoSC)));
+			$('#valorEC').val(valorEC(guardaEC, parseFloat(configuration.rhoAir), parseFloat(configuration.rhoSC)).toFixed(3));
 			$('#loading').hide();
 		} else if(data.error=="config"){
 			alert('Cant configure Wave. Error configuration');
@@ -751,7 +746,7 @@ function valorEC(puntosEC,rhoAir,rhoSC){
 	}
 	rho=rho/5;
 	var rhoInf=(2*( ((rhoAir-rhoSC)*(rho)-rhoAir) / ((1+rhoSC)*(rho-rhoAir) +(rhoAir-rhoSC)*(1+rhoAir)) )+1);
-	return (guardaConstantK/50)*(1-rhoInf)/(1+rhoInf);
+	return (configuration.constantK/50)*(1-rhoInf)/(1+rhoInf);
 }
 
 function actualizarLabel() {
@@ -778,8 +773,6 @@ function actualizarLabel() {
 					$('#calculate2ndGuardar').prop('disabled', false);
 					rango = graficar(data.wave, svg1, data.cL, data.wL);
 					guardaOnda = data.wave;
-					guardaWL = data.wL;
-					guardaCL = data.cL;
 					$('#loading').hide();
 					if (data.firstPeak != "" && data.firstPeak != undefined) {
 						mostrarFirstPeak((data.firstPeak - data.cL) * 340/ data.wL, rectaFija);
@@ -808,15 +801,14 @@ function actualizarLabel() {
 function actualizarLabelConfig(onda) {
 	$('#loadingConfig').show();
 
-	var config = new Object();
-	config.windowLength = $('#windowLength').val();
-	config.cableLength = $('#cableLength').val();
-	config.numberPoints = $('#numberPoints').val();
-	config.probeCell = $('#probeCell').val();
-	config.probeOffset = $('#probeOffset').val();
-	config.probeLength = $('#probeLength').val();
-	config.averagePoints = $('#averagePoints').val();
-	config.vp = $('#vp').val();
+	configuration.windowLength = $('#windowLength').val();
+	configuration.cableLength = $('#cableLength').val();
+	configuration.numberPoints = $('#numberPoints').val();
+	configuration.probeCell = $('#probeCell').val();
+	configuration.probeOffset = $('#probeOffset').val();
+	configuration.probeLength = $('#probeLength').val();
+	configuration.averagePoints = $('#averagePoints').val();
+	configuration.vp = $('#vp').val();
 
 	svg3.remove();
 	$("#divGraphConfig").html("");
@@ -826,15 +818,13 @@ function actualizarLabelConfig(onda) {
 	$.post(
 		'/configOnda',
 		{
-			myData : JSON.stringify(config)
+			myData : JSON.stringify(configuration)
 		},
 		function(data) {
 			if (data.error == "" || data.error==undefined) {
 				$('#calcularHumedadConfig').prop('disabled', false); 
-				rango = graficar(data.wave, svg3, config.cableLength,config.windowLength);
+				rango = graficar(data.wave, svg3, configuration.cableLength,configuration.windowLength);
 				guardaOnda=data.wave;
-				guardaCL=config.cableLength;
-				guardaWL=config.windowLength;
 				$('#loadingConfig').hide();
 			}  else if(data.error=="config"){
 				alert('Cant configure Wave. Error configuration');
@@ -917,7 +907,7 @@ function eliminarConfig() {
 function rellenarMostrar(row) {
 
 	$("#informacion2").val(row.info);
-	$("#labelOnda").html("<font color='white'> Project: </font>" +row.config +"<font color='white'> &nbsp;&nbsp;&nbsp;&nbsp;Date:  </font>"   +row.fecha);
+	$("#labelOnda").html("<font color='white'> Project: </font>" +row.configuration.name +"<font color='white'> &nbsp;&nbsp;&nbsp;&nbsp;Date:  </font>"   +row.fecha);
 
 	$("#checkBoxMostrar").prop("checked", false);
 	if (row.ec != "") {
@@ -925,9 +915,9 @@ function rellenarMostrar(row) {
 	} else {
 		$('#valorECMostrar').val('Not Calculated');
 	}
-	if (row.firstPeak != "") {
-		$('#firstPeakMostrar').val(row.firstPeak);
-		guardaFirstPeak=$('#firstPeakMostrar').val();
+	if (row.configuration.firstPeak != "") {
+		$('#firstPeakMostrar').val(row.configuration.firstPeak);
+		configuration.firstPeak=$('#firstPeakMostrar').val();
 	} else {
 		$('#firstPeakMostrar').val('Not calculated');
 	}
@@ -941,8 +931,8 @@ function rellenarMostrar(row) {
 		$("#valor2ndPeakMostrar").attr("readonly", false);
 		$('#valor2ndPeakMostrar').val(row.secondPeak);
 		//las dos líneas que vienen a continuación podrían tomar valores sin tener que calcular!
-		$('#valorHumedadMostrar').val(waterContent(row.firstPeak,row.secondPeak)[0].toFixed(3));
-		$('#valorEpsilonMostrar').val(waterContent(row.firstPeak,row.secondPeak)[1].toFixed(3));																			// que
+		$('#valorHumedadMostrar').val(waterContent(row.configuration.firstPeak,row.secondPeak)[0].toFixed(3));
+		$('#valorEpsilonMostrar').val(waterContent(row.configuration.firstPeak,row.secondPeak)[1].toFixed(3));																			// que
 																				
 		$('#checkBoxMostrarDiv').show();
 
@@ -969,12 +959,12 @@ function muestra() {
 
 }
 
-var datos = []; // Datos de la bootstrap Table
+var datosBootstrap = []; // Datos de la bootstrap Table
 
 function actualizaDatos() {
-	datos = [];
+	datosBootstrap = [];
 	for (var i = 0, len = localStorage.length; i < len; ++i) {
-		datos.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
+		datosBootstrap.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
 	}
 }
 
@@ -1027,7 +1017,7 @@ function initTable() {
 	actualizaDatos();
 	$table.bootstrapTable('destroy').bootstrapTable({
 		height : 448,
-		data : datos,
+		data : datosBootstrap,
 		locale : $('#locale').val(),
 		columns : [ [ {
 			field : 'state',
@@ -1035,7 +1025,7 @@ function initTable() {
 			align : 'center',
 			valign : 'middle'
 		}, {
-			field : 'config',
+			field : 'configuration.name',
 			title : 'Proyect',
 			sortable : true,
 			align : 'center',
@@ -1153,7 +1143,7 @@ function graficar(onda, svg, cL, wL) {
 			mostrarFirstPeak((equis - cL) * 340 / wL, rectaFija);
 			$("#firstPeak").val(equis.toFixed(2));
 			$("#firstPeakMostrar").val(equis.toFixed(2));
-			guardaFirstPeak=$("#firstPeakMostrar").val();
+			configuration.firstPeak=$("#firstPeakMostrar").val();
 			$("#firstPeakConfig").val(equis.toFixed(2));
 			/*if($('#valor2ndPeakGuardar').val()!="Not calculated" && $('#valor2ndPeakGuardar').val()!="" && $('#valor2ndPeakGuardar').val()!="Clic Calculate"
 				|| $('#valor2ndPeakMostrar').val()!="Not calculated" && $('#valor2ndPeakMostrar').val()!="" && $('#valor2ndPeakMostrar').val()!="Clic Calculate"){
@@ -1255,7 +1245,7 @@ function tangentes(posFirstPeak) {
 	x = muestraT2(posmaxD, guardaOnda[posmaxD], posmaxD + 1,
 			guardaOnda[posmaxD + 1], minV, rectasD2);
 	mostrarSecondPeak(x, rectaFija2);
-	return (x / 340 * guardaWL + parseFloat(guardaCL));
+	return (x / 340 * configuration.windowLength + parseFloat(configuration.cableLength));
 	//Devuelve el valor numérico del 2nd Peak
 
 }

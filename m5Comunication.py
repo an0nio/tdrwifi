@@ -47,7 +47,6 @@ def HL(datos):
 
 def darValor(comando, valor):
     comando=comando+b' '+bytes(str(valor),'utf-8')
-    # lcd.print(comando)
     return HL(comando)
 
 def getWaveForm(ser):#si esperamos antes de pedir la onda ser.any()!=<bound method>
@@ -57,12 +56,8 @@ def getWaveForm(ser):#si esperamos antes de pedir la onda ser.any()!=<bound meth
 
     header = ser.read(6)
     if header[1] !=35:
-        #lcd.print("Error de cabecera")
-        #lcd.print(header[1])
         M5TextBox(24, 134, "Cant recive wave. Retrying", lcd.FONT_DejaVu18,0xFFFFFF, rotate=0)
         return "Error"+ str(header[1])
-    M5TextBox(100, 120, "Done", lcd.FONT_DejaVu18,0xFFFFFF, rotate=0)
-    
     data = ser.read()
     time.sleep(0.1)
     
@@ -75,12 +70,14 @@ def getWaveForm(ser):#si esperamos antes de pedir la onda ser.any()!=<bound meth
     ondaBin=ondaBin.replace((bytes([34])+bytes([198])), bytes([58]))#0x22 0xc6 > 0x3a
     try: 
       onda=struct.unpack('>251f',ondaBin)
+      M5TextBox(100, 120, "Done", lcd.FONT_DejaVu18,0xFFFFFF, rotate=0)
       return onda
     except: 
-      lcd.clear()
-      #lcd.print(len(ondaBin))
-      #lcd.print('error onda')
-      return None
+      M5TextBox(100, 120, "Unexpected Error. Retrying", lcd.FONT_DejaVu18,0xFFFFFF, rotate=0)
+      return "Error Unknow: Expected 1007 Bytes an recive "+str(len(ondaBin))
+      #Este error parece ser que solo ocurre con el tdr a 57600 Baudios. Cuando esto ocurre
+      #no hay ningun byte que recibir, ser.any()=0, pero sin embargo no ha recibido 251 puntos. 
+      #Aun no he encontrado el porque del error
     
 def getWaveJsonFich(ser):
 	wave=getWaveForm(ser)
