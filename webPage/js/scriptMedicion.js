@@ -499,8 +499,8 @@ $('#calcularSelec').click(function() {
 		configuration=data.configuration;
 		if(data.secondPeak=="Not calculated" || data.secondPeak==''){
 			data.secondPeak=valor2ndPeak(data);
-			data.humedad=waterContent(parseFloat(configuration.firstPeak ,data.secondPeak)[0]);
-			data.epsilon=waterContent(parseFloat(configuration.firstPeak ,data.secondPeak)[1]);
+			data.humedad=waterContent(parseFloat(configuration.firstPeak ,data.secondPeak))[0];
+			data.epsilon=waterContent(parseFloat(configuration.firstPeak ,data.secondPeak))[1];
 			localStorage.setItem(el, JSON.stringify(data));
 		}
 // initTable(); Preguntar a David
