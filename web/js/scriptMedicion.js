@@ -186,14 +186,15 @@ $("#añadir").click(function() {
 	$("#checkBoxMostrar").prop("checked", false);
 	$('#checkBoxGuardarDiv').hide();
 	$("#valor2ndPeakGuardar").attr("readonly", true);
-	$('#valor2ndPeakGuardar').val('Not calculated');
+	$('#valor2ndPeakGuardar').val('').blur();
 	$('[name=selectObtenerModal] option').filter(function() {
 		return ($(this).text() == String($('#configMedicion').val()));
 	}).prop('selected', true);
 	$("#informacion").val('').blur();
 	$("#valorEC").val('').blur();
+	$("#valorHumedadGuardar").val('').blur();
 	$("#firstPeak").val('').blur();
-	guardaEC=undefined;// guardaEC='';
+	guardaEC=undefined;
 	actualizarLabel();
 });
 
@@ -207,6 +208,8 @@ $("#refresh").click(function() {
 	i = 0;
 	rectasD1 = undefined;
 	rectasD2 = undefined;
+	$("#informacion").val('').blur();
+	$("#valorHumedadGuardar").val('').blur();
 	$("#valorEC").val('').blur();
 	$("#firstPeak").val('').blur();
 	actualizarLabel();
@@ -687,8 +690,10 @@ function añadirF() {
 	obj.info = $('#informacion').val();
 	obj.ec = $('#valorEC').val();
 	obj.onda = guardaOnda;
-	obj.graphEC = guardaEC;
-	cargarConfigM5();
+	if(guardaEC==undefined)
+		obj.graphEC = '';
+	else
+		obj.graphEC = guardaEC;
 	obj.configuration=configuration;
 	obj.secondPeak = $('#valor2ndPeakGuardar').val();
 	obj.humedad=$('#valorHumedadGuardar').val();

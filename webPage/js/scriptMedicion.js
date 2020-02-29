@@ -47,12 +47,17 @@ var selectionId;
 $(document).ready(function() {
 	muestra();
 	initTable();
-//	selectConfig("configMedicion");
-//	selectConfig("configModal");
-//	selectConfig("selectObtenerModal");
+// selectConfig("configMedicion");
+// selectConfig("configModal");
+// selectConfig("selectObtenerModal");
 });
 
-$('#inner-modal').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });//Dolor de cabeza con modals stacke
+$('#inner-modal').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });// Dolor
+																								// de
+																								// cabeza
+																								// con
+																								// modals
+																								// stacke
 
 
 
@@ -161,19 +166,26 @@ $('#xConfig').click(function() {
 
 $("#firstPeak").change(function() {
 	mostrarFirstPeak(($("#firstPeak").val() - guardaCL) * 340 / guardaWL, rectaFija);
-	/*if($('#valor2ndPeakGuardar').val()!="Not calculated" && $('#valor2ndPeakGuardar').val()!="" && $('#valor2ndPeakGuardar').val()!="Clic Calculate"){
-		$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
-		$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]);
-	}
-	Si se descomenta esto, calcula la humedad automáticamente al cambiar el valor*/
+	/*
+	 * if($('#valor2ndPeakGuardar').val()!="Not calculated" &&
+	 * $('#valor2ndPeakGuardar').val()!="" &&
+	 * $('#valor2ndPeakGuardar').val()!="Clic Calculate"){
+	 * $("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
+	 * $("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]); }
+	 * Si se descomenta esto, calcula la humedad automáticamente al cambiar el
+	 * valor
+	 */
 });
 
 
 $("#valor2ndPeakGuardar").change(function() {
 	mostrarSecondPeak(($("#valor2ndPeakGuardar").val() - guardaCL) * 340 / guardaWL, rectaFija2);
-	/*$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
-	$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]);
-	Si se descomenta esto, calcula la humedad automáticamente al cambiar el valor*/
+	/*
+	 * $("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
+	 * $("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]);
+	 * Si se descomenta esto, calcula la humedad automáticamente al cambiar el
+	 * valor
+	 */
 });
 
 
@@ -269,19 +281,26 @@ $("#cerrarBtn").click(function() {
 $("#firstPeakMostrar").change(function() {
 	configuration.firstPeak=$("#firstPeakMostrar").val();
 	mostrarFirstPeak(($("#firstPeakMostrar").val() - configuration.cableLength) * 340 / configuration.windowLength, rectaFija);
-	/*if($('#valor2ndPeakMostrar').val()!="Not calculated" && $('#valor2ndPeakMostrar').val()!="" && $('#valor2ndPeakMostrar').val()!="Clic Calculate"){
-		$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
-		$("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
-	}
-	Si se descomenta esto, calcula la humedad automáticamente al cambiar el valor*/
+	/*
+	 * if($('#valor2ndPeakMostrar').val()!="Not calculated" &&
+	 * $('#valor2ndPeakMostrar').val()!="" &&
+	 * $('#valor2ndPeakMostrar').val()!="Clic Calculate"){
+	 * $("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
+	 * $("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3)); }
+	 * Si se descomenta esto, calcula la humedad automáticamente al cambiar el
+	 * valor
+	 */
 });
 
 
 $("#valor2ndPeakMostrar").change(function() {
 	mostrarSecondPeak(($("#valor2ndPeakMostrar").val() - configuration.cableLength) * 340 / configuration.windowLength, rectaFija2);
-	/*$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
-	$("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
-	Si se descomenta esto, calcula la humedad automáticamente al cambiar el valor*/
+	/*
+	 * $("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
+	 * $("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
+	 * Si se descomenta esto, calcula la humedad automáticamente al cambiar el
+	 * valor
+	 */
 });
 
 
@@ -402,7 +421,7 @@ $("#eliminarBtn2").click(function() {
 	siguienteModal();
 });
 
-					//-------------modal del modal de mostrar
+					// -------------modal del modal de mostrar
 
 
 
@@ -456,7 +475,7 @@ $("#guardarBtnConfigMostrar").click(function() {
 
 
 
-					//---------------------boton export
+					// ---------------------boton export
 	
 $('#volcarConfig').click(function() {
 	volcarConfig();
@@ -471,15 +490,20 @@ $('#guardarCSV').click(function() {
 
 
 
-//----------------------boton calcularSelec
+// ----------------------boton calcularSelec
+
 $('#calcularSelec').click(function() {
 	var id = getIdSelections();
 	id.forEach(function(el) {
 		data=JSON.parse(localStorage.getItem(el));
-		if(data.secondPeak=='') alert('as');
-		data.secondPeak=valor2ndPeak(data);
-		localStorage.setItem(el, JSON.stringify(data));
-//		initTable();  Preguntar a David
+		configuration=data.configuration;
+		if(data.secondPeak=="Not calculated" || data.secondPeak==''){
+			data.secondPeak=valor2ndPeak(data);
+			data.humedad=waterContent(parseFloat(configuration.firstPeak ,data.secondPeak)[0]);
+			data.epsilon=waterContent(parseFloat(configuration.firstPeak ,data.secondPeak)[1]);
+			localStorage.setItem(el, JSON.stringify(data));
+		}
+// initTable(); Preguntar a David
 	});
 	
 });
@@ -493,7 +517,7 @@ $('#openSelected').click(function() {
 	
 
 
-//					--------------------------resto funciones
+// --------------------------resto funciones
 var rango = [];
 
 
@@ -583,7 +607,7 @@ $remove.click(function() {
 
 function waterContent(first,second){
 	var ks=1.01*(100*(second-first)/10)*(100*(second-first)/(configuration.probeLength*100));   
-	//alert(ks);
+	// alert(ks);
 	return ([ a0+ks*a1+ks*ks*a2+ks*ks*ks*a3, ks]);
 	
 }
@@ -623,7 +647,8 @@ function download(filename, text) {
 
 
 function volcarConfig() {
-//	alert(browser.downloads.showDefaultFolder());  ----No entiendo porque no puedo  utilizar esto!
+// alert(browser.downloads.showDefaultFolder()); ----No entiendo porque no puedo
+// utilizar esto!
 
 	  var csv="Date, humity, epsilon, ec  \n";
 	  for (var i = 0, len = localStorage.length; i < len; ++i) {
@@ -999,7 +1024,8 @@ function rellenarMostrar(row) {
 	} else {
 		$("#valor2ndPeakMostrar").attr("readonly", false);
 		$('#valor2ndPeakMostrar').val(parseFloat(row.secondPeak).toFixed(3));
-		//las dos líneas que vienen a continuación podrían tomar valores sin tener que calcular!
+		// las dos líneas que vienen a continuación podrían tomar valores sin
+		// tener que calcular!
 		$('#valorHumedadMostrar').val(waterContent(row.configuration.firstPeak,row.secondPeak)[0].toFixed(3));
 		$('#valorEpsilonMostrar').val(waterContent(row.configuration.firstPeak,row.secondPeak)[1].toFixed(3));																			// que
 																				
@@ -1023,7 +1049,7 @@ function muestra() {
 
 }
 
-//			--------------------------------------Bootstrap table----------------
+// --------------------------------------Bootstrap table----------------
 
 var datosBootstrap = []; // Datos de la bootstrap Table
 
@@ -1059,7 +1085,9 @@ function operateFormatter(value, row, index) {
 	return [
 			'<a class="mostrar" href="javascript:void(0)" title="Mostrar">',
 			'<i class="fa fa-bar-chart fa-2x" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#modal2"></i> ',
-//			'<button type="button" class="btn btn-warning btn-sm" data-toggle="modal"  data-backdrop="static" data-keyboard="false" data-target="#modal2">Results</button>',
+// '<button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+// data-backdrop="static" data-keyboard="false"
+// data-target="#modal2">Results</button>',
 			'</a>  ', ].join('')
 }
 
@@ -1214,23 +1242,30 @@ function onclickF() {
 		$("#firstPeakMostrar").val(equis.toFixed(2));
 		configuration.firstPeak=$("#firstPeakMostrar").val();
 		$("#firstPeakConfig").val(equis.toFixed(2));
-		/*if($('#valor2ndPeakGuardar').val()!="Not calculated" && $('#valor2ndPeakGuardar').val()!="" && $('#valor2ndPeakGuardar').val()!="Clic Calculate"
-			|| $('#valor2ndPeakMostrar').val()!="Not calculated" && $('#valor2ndPeakMostrar').val()!="" && $('#valor2ndPeakMostrar').val()!="Clic Calculate"){
-				$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
-				$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
-				$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]);
-				$("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
-				Si se descomenta esto, se calcula el valor de humedad al hacer click
-			}*/
+		/*
+		 * if($('#valor2ndPeakGuardar').val()!="Not calculated" &&
+		 * $('#valor2ndPeakGuardar').val()!="" &&
+		 * $('#valor2ndPeakGuardar').val()!="Clic Calculate" ||
+		 * $('#valor2ndPeakMostrar').val()!="Not calculated" &&
+		 * $('#valor2ndPeakMostrar').val()!="" &&
+		 * $('#valor2ndPeakMostrar').val()!="Clic Calculate"){
+		 * $("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
+		 * $("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
+		 * $("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]);
+		 * $("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
+		 * Si se descomenta esto, se calcula el valor de humedad al hacer click }
+		 */
 	} else {
 		mostrarSecondPeak((equis - cL) * 340 / wL, rectaFija2);
 		$("#valor2ndPeakGuardar").val(equis.toFixed(2));
 		$("#valor2ndPeakMostrar").val(equis.toFixed(2));
-		/*$("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
-		$("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
-		$("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]);
-		$("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
-		Si se descomenta esto, se calcula el valor de humedad al hacer click*/
+		/*
+		 * $("#valorHumedadGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[0]);
+		 * $("#valorHumedadMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
+		 * $("#valorEpsilonGuardar").val(waterContent(parseFloat($('#firstPeak').val()),parseFloat($('#valor2ndPeakGuardar').val()))[1]);
+		 * $("#valorEpsilonMostrar").val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
+		 * Si se descomenta esto, se calcula el valor de humedad al hacer click
+		 */
 	}
 }
 
@@ -1381,7 +1416,7 @@ function tangentes(posFirstPeak) {
 			guardaOnda[posmaxD + 1], minV, rectasD2);
 	mostrarSecondPeak(x, rectaFija2);
 	return (x / 340 * configuration.windowLength + parseFloat(configuration.cableLength));
-	//Devuelve el valor numérico del 2nd Peak
+	// Devuelve el valor numérico del 2nd Peak
 
 }
 
