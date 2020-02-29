@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tektronix y Tdr100</title>
+<meta name="description" content="tdr"/>
+<meta name="author" content="JJJ">
+
+
+
+<!-- TODO: poner los enlaces de la web -->
+
+
+<link rel="stylesheet" href="css/bootstrap-table.min.css"> 
+<link rel="stylesheet" href="css/bootstrap.min.css"  > 
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+
+<script src="js/bootstrap.min.js"></script> 
+<script src="js/d3.js"></script> 
+<script src="js/jquery-3.4.1.js"></script> 
+<script src="js/bootstrap.bundle.min.js"></script> 
+<script src="js/bootstrap-table.min.js"></script> 
+<script src= "js/scriptMedicion.js" type="text/javascript"> </script> 
+
+
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+
+<div class="container "  >
+
+<h2 style="margin-top:20px"><center>WIFI TDR</center></h2>
+
+<button id="calcularSelec" disabled class="btn btn-warning" style="margin-right: 10px;" > Calculate Selected
+</button>
+
+<button id="openSelected" disabled class="btn secondary" style=" margin-left: 10px; margin-right: 10px;" > Open Selected
+</button>
+
+
+      <div class="field-wrap" id="muestraNo"  style="text-align:center ; margin-top: 3%">
+				<label style=" text-align:right;font-size:22px;" >
+					No waves Exported 
+				</label>
+			</div>
+			
+	
+	
+<div id="tablaBootstrap">
+	<table class="table table-hover"
+	  id="table"	  
+	  data-toggle="table"
+	  data-search="true"
+	  data-click-to-select="true"
+	  data-detail-formatter="detailFormatter"
+	  data-minimum-count-columns="2"
+	  data-pagination="true"
+	  data-id-field="id"
+	  data-page-size="5"
+	  data-page-list="[5,10, 25, 50, 100, all]">
+	  
+	</table>
+</div>
+	
+	<div id="toolbar">
+	  <button id="remove" class="btn btn-danger"  disabled>
+	    <i class="glyphicon glyphicon-remove"></i> Delete
+		</button>
+	</div>
+			<div style=" margin-top: 15px; float: right;">
+			<button id="volcarConfigParcial" disabled class="btn btn-success"  data-toggle="modal"  data-backdrop="static" data-keyboard="false" data-target="#modalExportar">
+					Export selected results
+	  		</button>
+	  		</div>
+			<div style=" margin-top: 15px">
+			  <label id="btnImportar" for="files" class="btn btn-info">Import data</label>
+			  <input id="files" accept=".json" style="visibility:hidden;" type="file">
+			</div>
+	
+	</div>   
+	
+<!-- 				---------------------------Modal Muestra de la onda--------------------------- -->
+
+
+
+<div class="modal fade bd-example-modal-xl" id="modal2" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="labelOnda">Muestra de la onda</h5>
+        <button id="xMostrar" type="button" class="close"  aria-label="Close">
+          <span  aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div>
+            <button id="configOndaMostrar" style="float:right"type="button"  class="btn btn-primary btn-sm" >Show Configuration</button>
+            <button type="button"style="float: right;" id="guardarBtnConfigMostrar" class="btn  btn-success btn-sm" >Save Configuration</button>
+      </div>
+      
+       <div id="muestraConfigForm" >
+       		<div class="modal-body">
+				<div class="form-row col-md-12">
+						<div class="col-4">
+							<label>
+								Cursor 
+							</label>
+								<input type=number step="0.01" readonly="" class="form-control form-control-sm" id="cableLengthCM" name="cableLengthCM"value=3.38 min=0 max=200> 
+						</div>
+						<div class="col-4">
+									<label>
+										Dist/Div
+									</label>	
+									<input type=number step="0.01"  readonly="" class="form-control form-control-sm" id="windowLengthCM" name="windowLengthCM"value=1.0 min=0 max=200> 
+						</div>
+						<div class="col-4">
+									<label>
+											Constant K
+									</label>	
+									<input type=number step="0.01" class="form-control form-control-sm" id="constantKCM" name="constantKCM"value=1.00 min=0 max=200> 
+									<input type=number style="visibility:hidden;position:absolute"class="form-control form-control-sm" id="numberPointsCM" name="numberPointsCM" value=251 min=1 max=5000> 
+						</div>
+					</div>
+			
+					<div class="form-row col-md-12">
+						<div class="col-4">
+							<label>
+								&rho;<sub>sc</sub>
+							</label>
+								<input type=number step="0.01" class="form-control form-control-sm" id="rhoSCCM" name="rhoSCCM"value=-1.00 min=0 max=200> 
+								<input type=number style="visibility:hidden;position:absolute"class="form-control form-control-sm" id="probeCellCM" name="probeCellCM" value=1 min=0 max=3> 
+								
+						</div>
+						<div class="col-4">
+									<label>
+										&rho;<sub>air</sub>
+									</label>	
+									<input type=number step="0.01" class="form-control form-control-sm" id="rhoAirCM" name="rhoAirCM"value=1.00 min=0 max=200> 
+									<input type=number style="visibility:hidden;position:absolute" step="0.01" class="form-control form-control-sm" id="probeOffsetCM" name="probeOffsetCM"value=0.09 min=0 max=2> 
+						</div>
+						<div class="col-4">
+									<label>
+										Probe length
+									</label>	
+									<input type=number step="0.01"class="form-control form-control-sm" id="probeLengthCM" name="probeLengthCM" value=0.3 min=0 max=5> 
+						</div>
+					</div>
+			
+			
+					<div class="form-row col-md-12">
+						<div class="col-4">
+									<label>
+										Average points
+									</label>	
+									<input type=number class="form-control form-control-sm" id="averagePointsCM"  readonly="" name="averagePointsCM" value=1 min=1 max=32> 
+						</div>
+						<div class="col-4">
+									<label>
+										Vp 
+									</label>	
+									<input type=number step="0.01" class="form-control form-control-sm" id="vpCM" readonly=""name="vpCM"value=0.99 min=0 max=1> 
+						</div>
+						<div class="col-4">
+							<label>
+								First Peak
+							</label>	
+									<input type=number step="0.01" class="form-control form-control-sm" id="firstPeakCM"readonly="" name="firstPeakCM" value=0.99 min=0 max=1> 
+						</div>
+						
+					</div>
+				</div>
+			</div>	
+      
+            
+			<div id="divGraph2"></div>
+			
+				<div class="form-row col-md-12" >
+					<div class="col-3">
+						<label >First Peak: </label>
+					</div>
+					<div class="col-3">
+							<input class="form-control form-control-sm" id="firstPeakMostrar" placeholder="Click Graph" type="text">
+					</div>
+					<div class="col-3">
+						<label>Second Peak: </label>
+					</div>
+					<div class="col-3">
+						 <fieldset>
+							<input class="form-control form-control-sm" id="valor2ndPeakMostrar" placeholder="Clic Calculate" readonly="" type="text">
+  						</fieldset>
+					</div>
+				</div>
+			
+			
+			<div class="form-row col-md-12" style="margin-top: 10px">
+					<div class="col-3">
+						<button id="calculate2ndMostrar" ype="button" class="btn btn-success btn-sm" >Water content</button>
+					</div>
+					<div class="col-3">
+						  <fieldset>
+								<input class="form-control form-control-sm" id="valorHumedadMostrar" placeholder="Clic Calculate" readonly="" type="text">
+  						</fieldset>
+					</div>
+					<div class="col-6" id="checkBoxMostrarDiv">
+						  <label><input style="margin-top: 8px" type="checkbox" id="checkBoxMostrar" value="first_checkbox"> Manually select 2nd Peak</label>
+					</div>
+			</div>
+			
+			<div class="form-row col-md-12" style="margin-top: 10px;margin-bottom: 10px">
+				<div class="col-3">
+						<label style="float:right">Epsilon: </label>
+					</div>
+					<div class="col-3">
+						 <fieldset>
+							<input class="form-control form-control-sm" id="valorEpsilonMostrar" placeholder="Clic Calculate" readonly="" type="text">
+  						</fieldset>
+					</div>
+					<div class="col-3">
+						<label style="float:right">EC: </label>
+					</div>
+					<div class="col-3">
+						 <fieldset>
+							<input class="form-control form-control-sm" id="valorECMostrar" placeholder="Clic Calculate" readonly="" type="text">
+  						</fieldset>
+					</div>
+			</div>
+			
+			
+			
+      <div > 
+      	   <textarea  id="informacion2" placeholder="Information... " name="textarea" style="width: 90% ; margin-left: 5%" ></textarea>
+      </div>
+      <div class="modal-footer">
+        <button id="cerrarBtn2" type="button" class="btn btn-primary btn-sm">Close</button>
+        <button id="eliminarBtn2" type="button" class="btn btn-danger btn-sm">Delete</button>
+        <button type="button" id="guardarBtn2" class="btn  btn-success btn-sm" >Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade bd-example-modal-xl" id="modalExportar" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Waveform</h5>
+        <button id="xGuardar"type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+			</div>
+			
+				<div id=checkBoxDinamico> 
+		 			<label id="checkBoxDinamico" ></label>
+		 		</div>
+
+			
+
+
+      <div class="modal-footer">
+        <button id="cerrarBtn" type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+        <button type="button" id="guardarCSV" class="btn  btn-success btn-sm" data-dismiss="modal">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script src= "js/scriptMedicion.js" type="text/javascript"> </script> 
+
+
+
+
+
+</body> 
+</html>
+
