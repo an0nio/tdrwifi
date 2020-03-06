@@ -503,8 +503,8 @@ $('#calcularSelec').click(function() {
 		configuration=data.configuration;
 		if(data.secondPeak=="Not calculated" || data.secondPeak==''){
 			data.secondPeak=valor2ndPeak(data);
-			data.humedad=waterContent(parseFloat(configuration.firstPeak ,data.secondPeak))[0];
-			data.epsilon=waterContent(parseFloat(configuration.firstPeak ,data.secondPeak))[1];
+			data.humedad=waterContent(parseFloat(configuration.firstPeak) ,parseFloat(data.secondPeak))[0];
+			data.epsilon=waterContent(parseFloat(configuration.firstPeak) ,parseFloat(data.secondPeak))[1];
 			localStorage.setItem(el, JSON.stringify(data));
 		}
 // initTable(); Preguntar a David
@@ -617,7 +617,7 @@ function waterContent(first,second){
 }
 
 function eliminarElto() {
-	if (window.confirm("Sure?")) {
+	if (window.confirm("Are you sure?")) {
 		var id = getIdSelections()
 		$table.bootstrapTable('remove', {
 			field : 'id',
@@ -705,8 +705,15 @@ function volcarConfigParcial() {
 }
 
 function siguienteModal(){
-	if(selectionId==undefined || selectionId=='')
+	if(selectionId==undefined || selectionId==''){
 		$('#modal2').modal('toggle');
+		muestra();
+		initTable();
+		$('#calcularSelec').prop('disabled', true);
+		$('#openSelected').prop('disabled', true);
+		$('#volcarConfigParcial').prop('disabled', true);
+		$('#remove').prop('disabled', true);
+	}
 	else if(selectionId.length>0){
 		$('#modal2').modal('show');
 		$('#muestraConfigForm').hide();
