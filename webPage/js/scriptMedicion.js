@@ -52,12 +52,6 @@ $(document).ready(function() {
 // selectConfig("selectObtenerModal");
 });
 
-$('#inner-modal').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });// Dolor
-																								// de
-																								// cabeza
-																								// con
-																								// modals
-																								// stacke
 
 
 
@@ -325,7 +319,7 @@ window.operateEvents = {
 			rectaFija = svg2.append("line");
 			mostrarFirstPeak((row.configuration.firstPeak - row.configuration.cableLength) * 340 / row.configuration.windowLength, rectaFija);
 		}
-		if (row.secondPeak != "" && row.secondPeak != undefined) {
+		if (row.secondPeak != "" && row.secondPeak != undefined && row.secondPeak!="Not calculated") {
 			rectaFija2 = svg2.append("line");
 			mostrarSecondPeak((row.secondPeak - row.configuration.cableLength) * 340 / row.configuration.windowLength,
 					rectaFija2);
@@ -461,14 +455,24 @@ $("#guardarBtnConfigMostrar").click(function() {
 	configuration.rhoAir=$('#rhoAirCM').val();
 	data.configuration.probeLength=$('#probeLengthCM').val();
 	configuration.probeLength=$('#probeLengthCM').val();
+	if(data.secondPeak!="Not calculated" && data.secondPeak!=''){
+		data.humedad=waterContent(parseFloat(data.configuration.firstPeak),parseFloat(data.secondPeak))[0];
+		data.epsilon=waterContent(parseFloat(data.configuration.firstPeak),parseFloat(data.secondPeak))[1];
+	}
+		
+	if(data.graphEC!="Not calculated" && data.graphEC!='' && data.graphEC!=undefined){
+		data.ec=valorEC(data.graphEC, parseFloat(data.configuration.rhoAir), parseFloat(data.configuration.rhoSC));
+	}
 	localStorage.setItem(id, JSON.stringify(data));
+	
 	
 	if($('#valorHumedadMostrar')!=''){
 		$('#valorHumedadMostrar').val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[0].toFixed(3));
 		$('#valorEpsilonMostrar').val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
 		}
 	if($('#valorECMostrar').val()!='' && $('#valorECMostrar').val()!=undefined && !isNaN($('#valorECMostrar').val())){
-		$('#valorECMostrar').val(valorEC(data.graphEC, parseFloat(data.rhoAir), parseFloat(data.rhoSC)));
+		$('#valorECMostrar').val(valorEC(data.graphEC, parseFloat(data.configuration.rhoAir), parseFloat(data.configuration.rhoSC)).toFixed(3));
+		
 	}
 });
 
@@ -499,8 +503,8 @@ $('#calcularSelec').click(function() {
 		configuration=data.configuration;
 		if(data.secondPeak=="Not calculated" || data.secondPeak==''){
 			data.secondPeak=valor2ndPeak(data);
-			data.humedad=waterContent(parseFloat(configuration.firstPeak ,data.secondPeak)[0]);
-			data.epsilon=waterContent(parseFloat(configuration.firstPeak ,data.secondPeak)[1]);
+			data.humedad=waterContent(parseFloat(configuration.firstPeak ,data.secondPeak))[0];
+			data.epsilon=waterContent(parseFloat(configuration.firstPeak ,data.secondPeak))[1];
 			localStorage.setItem(el, JSON.stringify(data));
 		}
 // initTable(); Preguntar a David
@@ -673,14 +677,18 @@ function crearDesplegableCheckBox(id){
 	$('#checkBoxDinamico').empty();
 	for(var el in JSON.parse(localStorage.getItem(id[0]))){
 		 if(j%3==0)  texto+="<div class='form-row col-md-12'>";
+		 if(el!="secondPeak" && el!="graphEC"){
 		 	texto+="<div class='col-4'>"
 		 		texto+="<label>";
 		 			texto+='<input type="checkbox" id="elementoCheckbox' + j + '" value="'+el+'">';
 		 			texto+=' '+ el;
 		 		texto+="</label>";
 		 	texto+="</div>";
-		 if((j+1)%3==0 )  texto+="</div>";
-		 j++;
+		 	j++;
+		 }
+		 	
+		 if((j)%3==0 )  texto+="</div>";
+		
 	}
 	 texto+="</div>";
 	 $('#checkBoxDinamico').html(texto);
@@ -710,6 +718,7 @@ function siguienteModal(){
 				.attr("viewBox", `0 0 460 400`).append("g").attr("transform",
 						"translate(" + margin.left + "," + margin.top + ")");
 		row=JSON.parse(localStorage.getItem(selectionId[0]));
+		id=selectionId[0];
 		guardaOnda = row.onda;
 		configuration=row.configuration;
 		rellenarMostrar(row);
@@ -718,7 +727,7 @@ function siguienteModal(){
 			rectaFija = svg2.append("line");
 			mostrarFirstPeak((row.configuration.firstPeak - row.configuration.cableLength) * 340 / row.configuration.windowLength, rectaFija);
 		}
-		if (row.secondPeak != "" && row.secondPeak != undefined) {
+		if (row.secondPeak != "" && row.secondPeak != undefined && row.secondPeak!="Not calculated") {
 			rectaFija2 = svg2.append("line");
 			mostrarSecondPeak((row.secondPeak - row.configuration.cableLength) * 340 / row.configuration.windowLength,
 					rectaFija2);
@@ -748,10 +757,7 @@ function guardarCSV(){
 	id.forEach(function(el) {
 		for(var j=0; j<lon;j++){
 			if($("#elementoCheckbox"+j).is(':checked')){
-				if($("#elementoCheckbox"+j).val()=="configuration") 
-					csv+=JSON.stringify(JSON.parse(localStorage.getItem(el))[$("#elementoCheckbox"+j).val()])+ ',';
-				else
-					csv+=JSON.parse(localStorage.getItem(el))[$("#elementoCheckbox"+j).val()]+ ',';
+				csv+=JSON.stringify(JSON.parse(localStorage.getItem(el))[$("#elementoCheckbox"+j).val()]).replace(/,/g, '|')+ ',';
 			}
 		}
 		csv=csv.slice(0,-1);
@@ -847,7 +853,7 @@ function valorEC(puntosEC,rhoAir,rhoSC){
 	}
 	rho=rho/5;
 	var rhoInf=(2*( ((rhoAir-rhoSC)*(rho)-rhoAir) / ((1+rhoSC)*(rho-rhoAir) +(rhoAir-rhoSC)*(1+rhoAir)) )+1);
-	return (guardaConstantK/50)*(1-rhoInf)/(1+rhoInf);
+	return ((parseFloat(configuration.constantK))/50*(1-rhoInf)/(1+rhoInf));
 }
 
 function actualizarLabel() {
@@ -1139,7 +1145,10 @@ function initTable() {
 			clickToSelect : false,
 			events : window.operateEvents,
 			formatter : operateFormatter
-		} ] ]
+		},{
+			field: 'info',
+			visible : false,
+			} ] ]
 	})
 
 	$table.on('check.bs.table uncheck.bs.table '
