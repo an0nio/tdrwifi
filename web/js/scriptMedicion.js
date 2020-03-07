@@ -1,6 +1,3 @@
-/*TODO
- * Para 2nd peak, que calcule la máxima tangente buscando a partir del primer pico  -----A partir del mínimo después del primer pico?
- */
 
 
 var $table = $('#table')
@@ -440,6 +437,15 @@ $("#guardarBtnConfigMostrar").click(function() {
 	configuration.rhoAir=$('#rhoAirCM').val();
 	data.configuration.probeLength=$('#probeLengthCM').val();
 	configuration.probeLength=$('#probeLengthCM').val();
+	
+	if(data.secondPeak!="Not calculated" && data.secondPeak!=''){
+		data.humedad=waterContent(parseFloat(data.configuration.firstPeak),parseFloat(data.secondPeak))[0];
+		data.epsilon=waterContent(parseFloat(data.configuration.firstPeak),parseFloat(data.secondPeak))[1];
+	}
+		
+	if(data.graphEC!="Not calculated" && data.graphEC!='' && data.graphEC!=undefined){
+		data.ec=valorEC(data.graphEC, parseFloat(data.configuration.rhoAir), parseFloat(data.configuration.rhoSC));
+	}
 	localStorage.setItem(id, JSON.stringify(data));
 	
 	if($('#valorHumedadMostrar')!=''){
@@ -447,7 +453,8 @@ $("#guardarBtnConfigMostrar").click(function() {
 		$('#valorEpsilonMostrar').val(waterContent(parseFloat($('#firstPeakMostrar').val()),parseFloat($('#valor2ndPeakMostrar').val()))[1].toFixed(3));
 		}
 	if($('#valorECMostrar').val()!='' && $('#valorECMostrar').val()!=undefined && !isNaN($('#valorECMostrar').val())){
-		$('#valorECMostrar').val(valorEC(data.graphEC, parseFloat(data.rhoAir), parseFloat(data.rhoSC)));
+		$('#valorECMostrar').val(valorEC(data.graphEC, parseFloat(data.configuration.rhoAir), parseFloat(data.configuration.rhoSC)).toFixed(3));
+		
 	}
 });
 
@@ -466,20 +473,10 @@ $('#volcarConfigParcial').click(function() {
 					//-----------------------Dispositivo y baudios
 
 $('#baudiosTDR').change(function(){
-	if($("#tdr100").is(':checked')){
-		cambiarBaudios($('#baudiosTDR').val());
-	}else{
-		alert('Select TDR100 decive');
-		$('#baudiosTDR').val(9600);
-	}
+	cambiarBaudios($('#baudiosTDR').val());
 });
 
 
-$('#dispositivo input[type=radio]').change(function(){
-	if($("#tektronix").is(':checked')){
-		alert('Falta implementar para Tektronix');
-	}
-});
 
 
 
@@ -688,16 +685,16 @@ function añadirF() {
 			+ ((date.getSeconds() < 10) ? ("0" + date.getSeconds()) : date
 					.getSeconds());
 	obj.info = $('#informacion').val();
+	obj.epsilon=$('#valorEpsilonGuardar').val();
+	obj.humedad=$('#valorHumedadGuardar').val();
 	obj.ec = $('#valorEC').val();
+	obj.configuration=configuration;
 	obj.onda = guardaOnda;
 	if(guardaEC==undefined)
 		obj.graphEC = '';
 	else
 		obj.graphEC = guardaEC;
-	obj.configuration=configuration;
 	obj.secondPeak = $('#valor2ndPeakGuardar').val();
-	obj.humedad=$('#valorHumedadGuardar').val();
-	obj.epsilon=$('#valorEpsilonGuardar').val();
 	localStorage.setItem(clave, JSON.stringify(obj));
 
 }
@@ -934,7 +931,7 @@ function rellenarMostrar(row) {
 		$('#checkBoxMostrarDiv').hide();
 	} else {
 		$("#valor2ndPeakMostrar").attr("readonly", false);
-		$('#valor2ndPeakMostrar').val(row.secondPeak);
+		$('#valor2ndPeakMostrar').val(row.secondPeak.toFixed(3));
 		//las dos líneas que vienen a continuación podrían tomar valores sin tener que calcular!
 		$('#valorHumedadMostrar').val(waterContent(row.configuration.firstPeak,row.secondPeak)[0].toFixed(3));
 		$('#valorEpsilonMostrar').val(waterContent(row.configuration.firstPeak,row.secondPeak)[1].toFixed(3));																			// que

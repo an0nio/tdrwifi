@@ -58,32 +58,14 @@
 
 <h2 style="margin-top:20px"><center>WIFI TDR</center></h2>
 
-<fieldset id="dispositivo">
-	<div class="form-row">
-		<div class="col-sm-6">
-		  <input id="tdr100" type="radio" name="dispositivo" value="tdr100" checked> TDR100 | Baudrate: &nbsp;&nbsp;&nbsp;
-		 	 <select class="form-control-sm" id="baudiosTDR">
-		 	  <option value=9600>9600 </option>
-			  <option value=19200>19200 </option>
-			  <option value=38400>38400</option>
-			  <option value=57600>57600</option>
-			  <option value=115200>115200</option>
-			</select>
-		</div> 
-		<div class="col-sm-6">
-		  <input id="tektronix" type="radio" name="dispositivo" value="tektronix"> Tektronix | Baudrate: &nbsp;&nbsp;&nbsp;
-		   <select class="form-control-sm" id="baudiosTDR">
-		 	  <option value=1200>1200 </option>
-			  <option value=1800>1800 </option>
-			  <option value=2400>2400</option>
-			  <option value=4800>4800</option>
-			  <option value=9600>9600</option>
-			  <option value=19200 selected="true">19200</option>
-			  </select>
-		</div>
-	</div>
-</fieldset>
-
+  Baudrate TDR100: &nbsp;&nbsp;&nbsp;
+ 	 <select class="form-control-sm" id="baudiosTDR">
+ 	  <option value=9600>9600 </option>
+	  <option value=19200>19200 </option>
+	  <option value=38400>38400</option>
+	  <option value=57600>57600</option>
+	  <option value=115200>115200</option>
+	</select>
 
 
 	<form style="margin-top: 10px">
@@ -204,13 +186,13 @@
 
 				<div class="form-row col-md-12" >
 					<div class="col-3">
-						<label style="float:right">First Peak: </label>
+						<input class="form-control form-control-sm"value="1st Peak: " readonly style="text-align: center; font-size:14px; color: #aaa; background-color: #32383e"  ></label>
 					</div>
 					<div class="col-3">
 							<input class="form-control form-control-sm" id="firstPeak" placeholder="Click Graph" type="text">
 					</div>
 					<div class="col-3">
-						<label style="float:right">Second Peak:</label>
+						<input class="form-control form-control-sm"value="2nd Reflexion: " readonly style="text-align: center; font-size:14px; color: #aaa; background-color: #32383e"  ></label>
 					</div>
 					<div class="col-3">
 						 <fieldset>
@@ -222,7 +204,7 @@
 
 			<div class="form-row col-md-12" style="margin-bottom: 10px; margin-top:10px">
 					<div class="col-3">
-						<button id="calculate2ndGuardar" disabled style="width: 100%" type="button" class="btn btn-success btn-sm" >Water Content</button>
+						<button id="calculate2ndGuardar" disabled style="width: 100%" type="button" class="btn btn-success btn-sm" >&theta; (m³ m⁻¹)</button>
 					</div>
 					<div class="col-3">
 						  <fieldset>
@@ -230,13 +212,13 @@
   						</fieldset>
 					</div>
 					<div class="col-6" id="checkBoxGuardarDiv">
-						  <label><input type="checkbox" id="checkBoxGuardar" value="first_checkbox"> Manually select 2nd Peak</label>
+						  <label><input type="checkbox" id="checkBoxGuardar" value="first_checkbox"> Manual 2nd reflexion</label>
 					</div>
 			</div>
 
 			<div class="form-row col-md-12" style="margin-bottom: 10px">
 				<div class="col-3">
-						<label style="float:right">Epsilon: </label>
+						<input class="form-control form-control-sm"value="&epsilon;: " readonly style="text-align: center; font-size:14px; color: #aaa; background-color: #32383e"  ></label>
 					</div>
 					<div class="col-3">
 						 <fieldset>
@@ -244,7 +226,7 @@
   						</fieldset>
 					</div>
 					<div class="col-3">
-						<button id="calculateEC" style="width: 100%"type="button" class="btn btn-success btn-sm" >EC</button>
+						<button id="calculateEC" style="width: 100%"type="button" class="btn btn-success btn-sm" >EC (dS m⁻¹)</button>
 					</div>
 					<div class="col-3">
 						  <fieldset>
@@ -353,7 +335,7 @@
 				<div class="form-row col-md-12">
 						<div class="col-4">
 							<label>
-								Cursor 
+								Cursor (m)
 							</label>
 								<input type=number step="0.01" readonly="" class="form-control form-control-sm" id="cableLengthCM" name="cableLengthCM"value=3.38 min=0 max=200> 
 						</div>
@@ -390,7 +372,7 @@
 						</div>
 						<div class="col-4">
 									<label>
-										Probe length
+										Probe length (m)
 									</label>	
 									<input type=number step="0.01"class="form-control form-control-sm" id="probeLengthCM" name="probeLengthCM" value=0.3 min=0 max=5> 
 						</div>
@@ -429,13 +411,13 @@
 			
 				<div class="form-row col-md-12" >
 					<div class="col-3">
-						<label >First Peak: </label>
+						<input class="form-control form-control-sm"value="1st Peak (m): " readonly style="text-align: center; font-size:14px; color: #aaa; background-color: #32383e"  ></label>
 					</div>
 					<div class="col-3">
 							<input class="form-control form-control-sm" id="firstPeakMostrar" placeholder="Click Graph" type="text">
 					</div>
 					<div class="col-3">
-						<label>Second Peak: </label>
+						<input class="form-control form-control-sm"value="2nd Reflexion: " readonly style="text-align: center; font-size:14px; color: #aaa; background-color: #32383e"  ></label>
 					</div>
 					<div class="col-3">
 						 <fieldset>
@@ -452,7 +434,7 @@
 			
 			<div class="form-row col-md-12" style="margin-top: 10px">
 					<div class="col-3">
-						<button id="calculate2ndMostrar" ype="button" class="btn btn-success btn-sm" >Water content</button>
+						<button id="calculate2ndMostrar" type="button" style="width: 100%" class="btn btn-success btn-sm" >&theta; (m³ m⁻¹)</button>
 					</div>
 					<div class="col-3">
 						  <fieldset>
@@ -466,7 +448,7 @@
 			
 			<div class="form-row col-md-12" style="margin-top: 10px;margin-bottom: 10px">
 				<div class="col-3">
-						<label style="float:right">Epsilon: </label>
+						<input class="form-control form-control-sm"value="&epsilon;: " readonly style="text-align: center; font-size:14px; color: #aaa; background-color: #32383e"  ></label>
 					</div>
 					<div class="col-3">
 						 <fieldset>
@@ -474,7 +456,7 @@
   						</fieldset>
 					</div>
 					<div class="col-3">
-						<label style="float:right">EC: </label>
+						<input class="form-control form-control-sm"value="EC (dS m¹): " readonly style="text-align: center; font-size:14px; color: #aaa; background-color: #32383e"  ></label>
 					</div>
 					<div class="col-3">
 						 <fieldset>
@@ -539,7 +521,7 @@
 						<div class="form-row col-md-12">
 							<div class="col-4">
 								<label>
-									Cursor 
+									Cursor (m)
 								</label>
 									<input type=number step="0.01" class="form-control form-control-sm" id="cableLength" name="cableLength"value=3.38 min=0 max=200> 
 							</div>
@@ -576,7 +558,7 @@
 							</div>
 							<div class="col-4">
 										<label>
-											Probe length
+											Probe length (m)
 										</label>	
 										<input type=number step="0.01"class="form-control form-control-sm" id="probeLength" name="probeLength" value=0.3 min=0 max=5> 
 							</div>
@@ -614,10 +596,10 @@
 			<div id="divGraphConfig"></div>
 			
 			<div class="form-row col-md-12" style="margin-bottom: 10px">
-				<div class="col-6">
-						<label style="float: right">First Peak: </label>
+				<div class="col-3">
+						<input class="form-control form-control-sm"value="1st Peak : " readonly style="text-align: center; font-size:14px; color: #aaa; background-color: #32383e"  ></label>
 					</div>
-					<div class="col-4">
+					<div class="col-3">
 						<input class="form-control form-control-sm" id="firstPeakConfig" placeholder="Click Graph" >
 					</div>
 			</div>
@@ -631,7 +613,7 @@
   						</fieldset>
 					</div>
 					<div class="col-3">
-						<label style="float:right">Epsilon: </label>
+					<input class="form-control form-control-sm"value="&epsilon;: " readonly style="text-align: center; font-size:14px; color: #aaa; background-color: #32383e"  ></label>
 					</div>
 					<div class="col-3">
 						 <fieldset>

@@ -489,7 +489,8 @@ $('#volcarConfigParcial').click(function() {
 });
 
 $('#guardarCSV').click(function() {
-	guardarCSV();
+	if(!guardarCSV()) alert('Nothing exported ');
+	
 });
 
 
@@ -681,7 +682,10 @@ function crearDesplegableCheckBox(id){
 		 	texto+="<div class='col-4'>"
 		 		texto+="<label>";
 		 			texto+='<input type="checkbox" id="elementoCheckbox' + j + '" value="'+el+'">';
-		 			texto+=' '+ el;
+		 			if(el=="onda") texto+=' Waveform';
+		 			else if(el=="fecha") texto+=' Date';
+		 			else if(el=="humedad") texto+= " &theta; (m³ m⁻³)";
+		 			else texto+=' '+ el.charAt(0).toUpperCase()+ el.slice(1);
 		 		texto+="</label>";
 		 	texto+="</div>";
 		 	j++;
@@ -756,9 +760,13 @@ function guardarCSV(){
 	var csv="";
 	for(var j=0; j<lon;j++){
 		if($("#elementoCheckbox"+j).is(':checked')){
-			csv+=$("#elementoCheckbox"+j).val()+',';
+			if($("#elementoCheckbox"+j).val()=="onda") csv+='Waveform ,';
+ 			else if($("#elementoCheckbox"+j).val()=="fecha") csv+='Date ,';
+ 			else if($("#elementoCheckbox"+j).val()=="humedad") csv+=' Water content ,';
+ 			else csv+=$("#elementoCheckbox"+j).val().charAt(0).toUpperCase()+ $("#elementoCheckbox"+j).val().slice(1)+',';
 		}
 	}
+	if(csv=="") return false; 
 	csv=csv.slice(0,-1);
 	csv+='\n';
 	id.forEach(function(el) {
