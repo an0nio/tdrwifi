@@ -489,7 +489,7 @@ $('#volcarConfigParcial').click(function() {
 });
 
 $('#guardarCSV').click(function() {
-	if(!guardarCSV()) alert('Nothing exported ');
+	if(guardarCSV()) alert('Nothing exported ');
 	
 });
 
@@ -766,7 +766,7 @@ function guardarCSV(){
  			else csv+=$("#elementoCheckbox"+j).val().charAt(0).toUpperCase()+ $("#elementoCheckbox"+j).val().slice(1)+',';
 		}
 	}
-	if(csv=="") return false; 
+	if(csv=="") return true; 
 	csv=csv.slice(0,-1);
 	csv+='\n';
 	id.forEach(function(el) {
