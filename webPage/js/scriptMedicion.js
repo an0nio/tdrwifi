@@ -301,6 +301,7 @@ $("#valor2ndPeakMostrar").change(function() {
 
 window.operateEvents = {
 	'click .mostrar' : function(e, value, row, index) {
+		var polinomio=new Object();
 		$('#muestraConfigForm').hide();
 		$("#configOndaMostrar").html('Show configuration');
 		$("#guardarBtnConfigMostrar").hide();
@@ -313,6 +314,14 @@ window.operateEvents = {
 		
 		guardaOnda = row.onda;
 		configuration=row.configuration;
+		if(configuration.polinomial==undefined ){
+			polinomio.a0=a0;
+			polinomio.a1=a1;
+			polinomio.a2=a2;
+			polinomio.a3=a3;
+			configuration.polinomial=polinomio;
+		}
+		
 		rellenarMostrar(row);
 		graficar(row.onda, svg2, row.configuration.cableLength, row.configuration.windowLength);
 		if (row.configuration.firstPeak != "" && row.configuration.firstPeak != undefined) {
@@ -334,6 +343,7 @@ window.operateEvents = {
 			field : 'id',
 			values : [ row.id ]
 		})
+		initTable();
 	}
 }
 
@@ -435,6 +445,18 @@ $("#configOndaMostrar").click(function() {
 			$('#probeLengthCM').val(configuration.probeLength);
 			$('#vpCM').val(configuration.vp);
 			$('#firstPeakCM').val(configuration.firstPeak);
+			configuration=data.configuration;
+			if(configuration.polinomial==undefined || configuration.polinomial==''){
+				$('#consta0').val(a0);
+				$('#consta1').val(a1);
+				$('#consta2').val(a2);
+				$('#consta3').val(a3);
+			}else{
+				$('#consta0').val(configuration.polinomial.a0);
+				$('#consta1').val(configuration.polinomial.a1);
+				$('#consta2').val(configuration.polinomial.a2);
+				$('#consta3').val(configuration.polinomial.a3);
+			}
 	}else{
 		$("#configOndaMostrar").html('Show configuration');
 			$("#guardarBtnConfigMostrar").hide();
@@ -445,6 +467,7 @@ $("#configOndaMostrar").click(function() {
 	});
 
 $("#guardarBtnConfigMostrar").click(function() {
+	var polinomio=new Object();
 	data=JSON.parse(localStorage.getItem(id));
 	
 	data.configuration.constantK=$('#constantKCM').val();
@@ -455,6 +478,14 @@ $("#guardarBtnConfigMostrar").click(function() {
 	configuration.rhoAir=$('#rhoAirCM').val();
 	data.configuration.probeLength=$('#probeLengthCM').val();
 	configuration.probeLength=$('#probeLengthCM').val();
+	
+	polinomio.a0=$('#consta0').val();
+	polinomio.a1=$('#consta1').val();
+	polinomio.a2=$('#consta2').val();
+	polinomio.a3=$('#consta3').val();
+	configuration.polinomial=polinomio;
+	data.configuration=configuration;
+	
 	if(data.secondPeak!="Not calculated" && data.secondPeak!=''){
 		data.humedad=waterContent(parseFloat(data.configuration.firstPeak),parseFloat(data.secondPeak))[0];
 		data.epsilon=waterContent(parseFloat(data.configuration.firstPeak),parseFloat(data.secondPeak))[1];
@@ -489,7 +520,7 @@ $('#volcarConfigParcial').click(function() {
 });
 
 $('#guardarCSV').click(function() {
-	if(!guardarCSV()) alert('Nothing exported ');
+	if(guardarCSV()) alert('Nothing exported ');
 	
 });
 
@@ -608,13 +639,18 @@ function selectConfig(nombre) { // Crea despleglable de seleccion desde el
 
 $remove.click(function() {
 	eliminarElto();
+	initTable();
 })
 
 function waterContent(first,second){
 	var ks=1.01*(100*(second-first)/10)*(100*(second-first)/(configuration.probeLength*100));   
-	// alert(ks);
-	return ([ a0+ks*a1+ks*ks*a2+ks*ks*ks*a3, ks]);
 	
+	if(configuration.polinomial==undefined || configuration.polinomial==''){
+		return ([ a0+ks*a1+ks*ks*a2+ks*ks*ks*a3, ks]);
+	}
+	return ([ parseFloat(configuration.polinomial.a0)+ks*parseFloat(configuration.polinomial.a1)+
+		ks*ks*parseFloat(configuration.polinomial.a2)+ks*ks*ks*parseFloat(configuration.polinomial.a3), ks]);
+
 }
 
 function eliminarElto() {
@@ -678,13 +714,15 @@ function crearDesplegableCheckBox(id){
 	$('#checkBoxDinamico').empty();
 	for(var el in JSON.parse(localStorage.getItem(id[0]))){
 		 if(j%3==0)  texto+="<div class='form-row col-md-12'>";
-		 if(el!="secondPeak" && el!="graphEC"){
+		 if(el!="graphEC"){
 		 	texto+="<div class='col-4'>"
 		 		texto+="<label>";
 		 			texto+='<input type="checkbox" id="elementoCheckbox' + j + '" value="'+el+'">';
 		 			if(el=="onda") texto+=' Waveform';
 		 			else if(el=="fecha") texto+=' Date';
 		 			else if(el=="humedad") texto+= " &theta; (m³ m⁻³)";
+		 			else if(el=="secondPeak") texto+= " Polinomial const";
+		 			else if(el=="id") texto+="Project name ";
 		 			else texto+=' '+ el.charAt(0).toUpperCase()+ el.slice(1);
 		 		texto+="</label>";
 		 	texto+="</div>";
@@ -732,6 +770,14 @@ function siguienteModal(){
 		id=selectionId[0];
 		guardaOnda = row.onda;
 		configuration=row.configuration;
+		if(configuration.polinomial==undefined){
+			var polinomio=new Object;
+			polinomio.a0=a0;
+			polinomio.a1=a1;
+			polinomio.a2=a2;
+			polinomio.a3=a3;
+			configuration.polinomial=polinomio;
+		}
 		rellenarMostrar(row);
 		graficar(row.onda, svg2, row.configuration.cableLength, row.configuration.windowLength);
 		if (row.configuration.firstPeak != "" && row.configuration.firstPeak != undefined) {
@@ -763,16 +809,33 @@ function guardarCSV(){
 			if($("#elementoCheckbox"+j).val()=="onda") csv+='Waveform ,';
  			else if($("#elementoCheckbox"+j).val()=="fecha") csv+='Date ,';
  			else if($("#elementoCheckbox"+j).val()=="humedad") csv+=' Water content ,';
+ 			else if($("#elementoCheckbox"+j).val()=="id") csv+=' Project Name ,';
+ 			else if($("#elementoCheckbox"+j).val()=="secondPeak") csv+='Polinomial constants ,';
  			else csv+=$("#elementoCheckbox"+j).val().charAt(0).toUpperCase()+ $("#elementoCheckbox"+j).val().slice(1)+',';
 		}
 	}
-	if(csv=="") return false; 
+	if(csv=="") return true; 
 	csv=csv.slice(0,-1);
 	csv+='\n';
 	id.forEach(function(el) {
 		for(var j=0; j<lon;j++){
 			if($("#elementoCheckbox"+j).is(':checked')){
-				csv+=JSON.stringify(JSON.parse(localStorage.getItem(el))[$("#elementoCheckbox"+j).val()]).replace(/,/g, '|')+ ',';
+				if($("#elementoCheckbox"+j).val()=="id"){
+					csv+=JSON.stringify(JSON.parse(localStorage.getItem(el)).configuration.name).replace(/,/g, '|')+ ',';
+				}else if($("#elementoCheckbox"+j).val()=="secondPeak"){
+					if(JSON.parse(localStorage.getItem(el)).configuration.polinomial==undefined){
+						var polinomio=new Object;
+						polinomio.a0=a0;
+						polinomio.a1=a1;
+						polinomio.a2=a2;
+						polinomio.a3=a3;
+						csv+=JSON.stringify(polinomio).replace(/,/g, '|')+ ',';
+					}
+					else csv+=JSON.stringify(JSON.parse(localStorage.getItem(el)).configuration.polinomial).replace(/,/g, '|')+ ',';
+				}
+				else{
+					csv+=JSON.stringify(JSON.parse(localStorage.getItem(el))[$("#elementoCheckbox"+j).val()]).replace(/,/g, '|')+ ',';
+				}
 			}
 		}
 		csv=csv.slice(0,-1);
@@ -1128,11 +1191,15 @@ function totalPriceFormatter(data) {
 		return sum + i
 	}, 0)
 }
+function altura(datos){
+	if (datos.length>8) return 180+58*8;
+	return 180+58*datos.length;
+}
 
 function initTable() {
 	actualizaDatos();
 	$table.bootstrapTable('destroy').bootstrapTable({
-		height : 448,
+		height : altura(datosBootstrap),
 		data : datosBootstrap,
 		locale : $('#locale').val(),
 		columns : [ [ {

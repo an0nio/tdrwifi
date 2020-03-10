@@ -63,12 +63,13 @@
 	  data-search="true"
 	  data-click-to-select="true"
 	  data-detail-formatter="detailFormatter"
-	  data-minimum-count-columns="2"
+	  data-minimum-count-columns="1"
 	  data-pagination="true"
 	  data-id-field="id"
-	  data-page-size="5"
-	  data-page-list="[5,10, 25, 50, 100, all]">
+	  data-page-list="[5,10,All]"
 	  
+	  data-page-size="All">
+	 
 	</table>
 </div>
 	
@@ -174,6 +175,34 @@
 								1st Peak (m)
 							</label>	
 									<input type=number step="0.01" class="form-control form-control-sm" id="firstPeakCM"readonly="" name="firstPeakCM" value=0.99 min=0 max=1> 
+						</div>
+						
+					</div>
+					<center style="margin-top: 10px">Polinomial constants: </center> 
+					<div class="form-row col-md-12">
+						<div class="col-3">
+									<label>
+										a0
+									</label>	
+									<input type=numberstep="0.01" class="form-control form-control-sm" id="consta0"  name="averagePointsCM" value=-5.3/100> 
+						</div>
+						<div class="col-3">
+									<label>
+										a1
+									</label>	
+									<input type=number step="0.01" class="form-control form-control-sm" id="consta1" name="vpCM"value=2.92 min=0 max=1> 
+						</div>
+						<div class="col-3">
+							<label>
+								a2
+							</label>	
+									<input type=number step="0.01" class="form-control form-control-sm" id="consta2" name="firstPeakCM" value=0.99 min=0 max=1> 
+						</div>
+						<div class="col-3">
+							<label>
+								a3
+							</label>	
+									<input type=number step="0.01" class="form-control form-control-sm" id="consta3"name="firstPeakCM" value=0.99 min=0 max=1> 
 						</div>
 						
 					</div>
