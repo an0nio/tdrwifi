@@ -72,9 +72,10 @@ $(document).ready(function() {
 	        for(key in obj){
 	        	localStorage.setItem(key, obj[key]);
 	        }
+	        muestra();
+	    	initTable();
     	}
-    	muestra();
-    	initTable();
+    	
     }
     
     document.getElementById('files').addEventListener('change', onChange);
@@ -833,6 +834,9 @@ function guardarCSV(){
 					}
 					else csv+=JSON.stringify(JSON.parse(localStorage.getItem(el)).configuration.polinomial).replace(/,/g, '|')+ ',';
 				}
+				else if($("#elementoCheckbox"+j).val()=="onda"){
+					csv+=JSON.stringify(JSON.parse(localStorage.getItem(el))[$("#elementoCheckbox"+j).val()]).replace(/,/g, '|').replace(/[\[\]']+/g,'')+ ',';
+				}
 				else{
 					csv+=JSON.stringify(JSON.parse(localStorage.getItem(el))[$("#elementoCheckbox"+j).val()]).replace(/,/g, '|')+ ',';
 				}
@@ -1421,22 +1425,24 @@ function valor2ndPeak(row){
 	var posminV = parseInt(Math.round(posFirstPeak));
 	var minV = onda[posminV];
 	var posmaxD = 0;
-	var maxD = onda[posminV + 1] - onda[posminV];
+	var maxD = onda[posminV + 10] - onda[posminV];
 	for (var i = posminV; i < onda.length - 1; i++) {
 		if (onda[i] < minV) {
 			minV = onda[i];
 			posminV = i;
 		}
 	}
-	for (var i = posminV; i < onda.length - 1; i++) {
-		if ((onda[i + 1] - onda[i]) > maxD) {
-			maxD = onda[i + 1] - onda[i];
+	for (var i = posminV; i < onda.length - 10; i++) {
+		if ((onda[i + 10] - onda[i]) > maxD) {
+			maxD = onda[i + 10] - onda[i];
 			posmaxD = i;
 		}
 	}
-	x = valorInter(posmaxD, onda[posmaxD], posmaxD + 1,
-			onda[posmaxD + 1], minV, rectasD2);
+
+	x = valorInter(posmaxD, onda[posmaxD], posmaxD + 10,
+			onda[posmaxD + 10], minV, rectasD2);
 	return (x / 340 * configuration.windowLength + parseFloat(configuration.cableLength));
+	
 }
 
 function valorInter(p0x, p0y, p1x, p1y, valor, recta) {
@@ -1487,7 +1493,7 @@ function tangentes(posFirstPeak) {
 	// punto para calcular tangentes y más
 	var minV = guardaOnda[posminV];
 	var posmaxD = 0;
-	var maxD = guardaOnda[posminV + 1] - guardaOnda[posminV];
+	var maxD = guardaOnda[posminV + 10] - guardaOnda[posminV];
 	for (var i = posminV; i < guardaOnda.length - 1; i++) {
 		
 		if (guardaOnda[i] < minV) {
@@ -1495,16 +1501,16 @@ function tangentes(posFirstPeak) {
 			posminV = i;
 		}
 	}
-	for (var i = posminV; i < guardaOnda.length - 1; i++) {
-		if ((guardaOnda[i + 1] - guardaOnda[i]) > maxD) {
-			maxD = guardaOnda[i + 1] - guardaOnda[i];
+	for (var i = posminV; i < guardaOnda.length - 10; i++) {
+		if ((guardaOnda[i + 10] - guardaOnda[i]) > maxD) {
+			maxD = guardaOnda[i + 10] - guardaOnda[i];
 			posmaxD = i;
 		}
 	}
 
 	muestraT1(minV, rectasD1);
-	x = muestraT2(posmaxD, guardaOnda[posmaxD], posmaxD + 1,
-			guardaOnda[posmaxD + 1], minV, rectasD2);
+	x = muestraT2(posmaxD, guardaOnda[posmaxD], posmaxD + 10,
+			guardaOnda[posmaxD + 10], minV, rectasD2);
 	mostrarSecondPeak(x, rectaFija2);
 	return (x / 340 * configuration.windowLength + parseFloat(configuration.cableLength));
 	// Devuelve el valor numérico del 2nd Peak
