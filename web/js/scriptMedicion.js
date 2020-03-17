@@ -191,6 +191,7 @@ $("#añadir").click(function() {
 	$("#valorEC").val('').blur();
 	$("#valorHumedadGuardar").val('').blur();
 	$("#firstPeak").val('').blur();
+	$("#valorEpsilonGuardar").val('').blur();
 	guardaEC=undefined;
 	actualizarLabel();
 });
@@ -209,6 +210,8 @@ $("#refresh").click(function() {
 	$("#valorHumedadGuardar").val('').blur();
 	$("#valorEC").val('').blur();
 	$("#firstPeak").val('').blur();
+	$("#valorEpsilonGuardar").val('').blur();
+	$("#valor2ndPeakGuardar").val('').blur();
 	actualizarLabel();
 });
 
@@ -595,10 +598,10 @@ function cambiarBaudios(valor){
 					alert('done');
 					}
 				 else {
-					alert('Cant change BaudRate. Error conexion');
+					alert('Can not change BaudRate. Error conexion');
 				}
 			}).fail(function() {
-		alert('Cant change Baudrate wave. Maybe not connected');
+		alert('Can not change Baudrate wave. Maybe not connected');
 	});
 }
 
@@ -718,20 +721,20 @@ function añadirEC(rango) {
 			$('#valorEC').val(valorEC(guardaEC, parseFloat(configuration.rhoAir), parseFloat(configuration.rhoSC)).toFixed(3));
 			$('#loading').hide();
 		} else if(data.error=="config"){
-			alert('Cant configure Wave. Error configuration');
+			alert('Can not configure Wave. Error configuration');
 			$('#loading').hide();
 		} else  {
 			if (i <= 5) {
 				i++;
 				return añadirEC(rango);
 			} else{
-				alert('Cant recive wave. So many tryes. Error'
+				alert('Can not recive wave. So many tryes. Error'
 						+ String(data.error));
 				$('#loading').hide();
 			}
 		}
 	}).fail(function() {
-			alert('Cant recive wave. Maybe not connected');
+			alert('Can not recive wave. Maybe not connected');
 			$('#loading').hide();
 		
 	});
@@ -781,7 +784,7 @@ function actualizarLabel() {
 						$("#firstPeak").val(data.firstPeak);
 					}
 				} else if(data.error=="config"){
-					alert('Cant configure Wave. Error configuration');
+					alert('Can not configure Wave. Error configuration');
 					$('#loading').hide();
 				}
 				else{ 
@@ -789,13 +792,13 @@ function actualizarLabel() {
 						i++;
 						return actualizarLabel();
 					} else{
-						alert('Cant recive wave. So many tryes. Error'
+						alert('Can not recive wave. So many tryes. Error'
 								+ String(data.error));
 						$('#loading').hide();
 					}
 				}
 			}).fail(function() {
-		alert('Cant recive wave. Maybe not connected');
+		alert('Can not recive wave. Maybe not connected');
 		$('#loading').hide();
 	});
 }
@@ -826,24 +829,26 @@ function actualizarLabelConfig(onda) {
 			if (data.error == "" || data.error==undefined) {
 				$('#calcularHumedadConfig').prop('disabled', false); 
 				rango = graficar(data.wave, svg3, configuration.cableLength,configuration.windowLength);
+				if($("#firstPeakConfig").val()!='')
+					mostrarFirstPeak(($("#firstPeakConfig").val() - configuration.cableLength) * 340 / configuration.windowLength, rectaFija);
 				guardaOnda=data.wave;
 				$('#loadingConfig').hide();
 			}  else if(data.error=="config"){
-				alert('Cant configure Wave. Error configuration');
+				alert('Can not configure Wave. Error configuration');
 				$('#loadingConfig').hide();
 			}else {
 				if (i <= 5) {
 					i++;
 					return actualizarLabelConfig();
 				} else{
-					alert('Cant recive wave. So many tryes. Error'
+					alert('Can not recive wave. So many tryes. Error'
 							+ String(data.error));
 					$('#loadingConfig').hide();
 				}
 					
 			}
 		}).fail(function() {
-			alert('Cant recive wave. Maybe not connected');
+			alert('Can not recive wave. Maybe not connected');
 			$('#loadingConfig').hide();
 		});
 }
@@ -931,7 +936,7 @@ function rellenarMostrar(row) {
 		$('#checkBoxMostrarDiv').hide();
 	} else {
 		$("#valor2ndPeakMostrar").attr("readonly", false);
-		$('#valor2ndPeakMostrar').val(row.secondPeak.toFixed(3));
+		$('#valor2ndPeakMostrar').val(parseFloat(row.secondPeak).toFixed(3));
 		//las dos líneas que vienen a continuación podrían tomar valores sin tener que calcular!
 		$('#valorHumedadMostrar').val(waterContent(row.configuration.firstPeak,row.secondPeak)[0].toFixed(3));
 		$('#valorEpsilonMostrar').val(waterContent(row.configuration.firstPeak,row.secondPeak)[1].toFixed(3));																			// que
@@ -1228,7 +1233,7 @@ function tangentes(posFirstPeak) {
 	// punto para calcular tangentes y más
 	var minV = guardaOnda[posminV];
 	var posmaxD = 0;
-	var maxD = guardaOnda[posminV + 1] - guardaOnda[posminV];
+	var maxD = guardaOnda[posminV + 10] - guardaOnda[posminV];
 	for (var i = posminV; i < guardaOnda.length - 1; i++) {
 		
 		if (guardaOnda[i] < minV) {
@@ -1236,19 +1241,19 @@ function tangentes(posFirstPeak) {
 			posminV = i;
 		}
 	}
-	for (var i = posminV; i < guardaOnda.length - 1; i++) {
-		if ((guardaOnda[i + 1] - guardaOnda[i]) > maxD) {
-			maxD = guardaOnda[i + 1] - guardaOnda[i];
+	for (var i = posminV; i < guardaOnda.length - 10; i++) {
+		if ((guardaOnda[i + 10] - guardaOnda[i]) > maxD) {
+			maxD = guardaOnda[i + 10] - guardaOnda[i];
 			posmaxD = i;
 		}
 	}
 
 	muestraT1(minV, rectasD1);
-	x = muestraT2(posmaxD, guardaOnda[posmaxD], posmaxD + 1,
-			guardaOnda[posmaxD + 1], minV, rectasD2);
+	x = muestraT2(posmaxD, guardaOnda[posmaxD], posmaxD + 10,
+			guardaOnda[posmaxD + 10], minV, rectasD2);
 	mostrarSecondPeak(x, rectaFija2);
 	return (x / 340 * configuration.windowLength + parseFloat(configuration.cableLength));
-	//Devuelve el valor numérico del 2nd Peak
+	// Devuelve el valor numérico del 2nd Peak
 
 }
 
