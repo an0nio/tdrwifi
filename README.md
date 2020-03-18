@@ -26,12 +26,11 @@ Software compatible with Campbell TDR-100 to aquire waveforms, measure volumetri
  - [Install rshell ](https://github.com/dhylands/rshell#installation)
  - [Install m5Burner](https://github.com/m5stack/m5-docs/blob/master/docs/en/related_documents/M5Burner.md#m5burner-1) and burn last version (works fine untill version UIFlow-v1.4.3 )
  - [Download](https://github.com/an0nio/tdrwifi/archive/master.zip) this repo and unzip
- - Run rshell micropython:
- 
- `$ rshell --buffer-size=32 --port=/dev/ttyUSB* --baud=115200` where \* is the conexion USB port ( \* = 0,1,2..)
- - Copy `/tdrwifi-master/web/` from folder where you unzip this repo  to m5Stack flash memory:
- 
-  `$   cp '/FOLDER/tdrwifi-master/web/' /flash`
+ - Run rshell micropython:<br/>
+    ```$ rshell --buffer-size=32 --port=/dev/ttyUSB* --baud=115200``` <br/>
+    where \* is the conexion USB port ( \* = 0,1,2..)
+ - Copy `/tdrwifi-master/web/` from folder where you unzip this repo  to m5Stack flash memory:<br/>
+    `$   cp '/FOLDER/tdrwifi-master/web/' /flash`
  
 - Install TDRWifi on m5STack (6 first steps explained on [this video](https://www.youtube.com/watch?v=UVUprvXjUbA)):
   - Click button on m5stack and press button configuration
