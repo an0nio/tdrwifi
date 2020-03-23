@@ -24,7 +24,7 @@ Software compatible with Campbell TDR-100 to aquire waveforms, measure volumetri
 
 ### Installation
  - [Install rshell ](https://github.com/dhylands/rshell#installation)
- - [Install m5Burner](https://github.com/m5stack/m5-docs/blob/master/docs/en/related_documents/M5Burner.md#m5burner-1) and burn last version (works fine untill version UIFlow-v1.4.3 )
+ - [Install m5Burner](https://docs.m5stack.com/#/en/related_documents/M5Burner) and burn last version (works fine untill version UIFlow-v1.4.3 )
  - [Download](https://github.com/an0nio/tdrwifi/archive/master.zip) this repo and unzip
  - Run rshell micropython:<br/>
     ```$ rshell --buffer-size=32 --port=/dev/ttyUSB* --baud=115200``` <br/>
