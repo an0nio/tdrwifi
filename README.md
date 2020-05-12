@@ -30,7 +30,7 @@ Software compatible with Campbell TDR-100 to aquire waveforms, measure volumetri
     ```$ rshell --buffer-size=32 --port=/dev/ttyUSB* --baud=115200``` <br/>
     where \* is the conexion USB port ( \* = 0,1,2..)
  - Copy `/tdrwifi-master/web/` from folder where you unzip this repo  to m5Stack flash memory:<br/>
-    `$   cp '/FOLDER/tdrwifi-master/web/' /flash`
+    `$   cp -r '/FOLDER/tdrwifi-master/web/' /flash`
  
 - Install TDRWifi on m5STack (6 first steps explained on [this video](https://www.youtube.com/watch?v=UVUprvXjUbA)):
   - Click button on m5stack and press button configuration
