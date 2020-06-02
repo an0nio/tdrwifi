@@ -23,7 +23,7 @@ Software compatible with Campbell TDR-100 to aquire waveforms, measure volumetri
 - [M5Burner](https://github.com/m5stack/m5-docs/blob/master/docs/en/related_documents/M5Burner.md): To burn a firmware to install TDRWifi.
 
 ### Installation  
- #### All steps to installation and getting started explained on [this video](https://github.com/an0nio/tdrwifi/video/videoTutorial.mp4) 
+ #### All steps to installation and getting started explained on [this video](https://github.com/an0nio/tdrwifi/blob/master/video/videoTutorial.mp4) 
  - [Install rshell ](https://github.com/dhylands/rshell#installation)
  - Download UIFlow-Desktop-IDE and M5Burner from [here](https://m5stack.com/pages/download)
  - [Download](https://github.com/an0nio/tdrwifi/archive/master.zip) this repo and unzip
